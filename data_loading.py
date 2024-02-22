@@ -1,5 +1,4 @@
-import pandas as pd
-import numpy as np
+
 
 filename = './data/boeing_practice.csv'
 
