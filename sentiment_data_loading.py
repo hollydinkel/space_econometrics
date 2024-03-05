@@ -10,7 +10,7 @@ import textacy
 ## Read the text file(s)
 data = ReadData()
 inp_file = [["./sentiment_data/marshall_planet.txt"],["./sentiment_data/marshall_planet2.txt"],["./sentiment_data/stepanova_airmo.txt"]]
-data.read_file(inp_file[2])
+data.read_file(inp_file[1])
 
 q = Qrmine()
 all_interviews = Content(data.content)
