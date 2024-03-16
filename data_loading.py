@@ -3,46 +3,45 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 
-# df = pd.read_excel('path/to/sheet.xlsx', 'sheet_name')
-#company_keys = './company_keys.json'
-#filename = './financial_data/planet_compiled.xlsx'
-filename1 = './financial_data/iQPS.xlsx'
-filename2 = './financial_data/synspective.xlsx'
-filename3 = './financial_data/planet.xlsx'
-sheet_name = 'income' # 'income' or 'consolidated'
+# Store company-specific parameters (plotting style, name, filename)
+# in a json dictionary for later lookup
+company_keys = './company_keys.json'
+sheet_name = 'income'
 
-#keys = json.load(open(company_keys))
-#print(keys["planet"]["sheet"])
-iQPS_data = pd.read_excel(filename1,sheet_name)
-iQPS_total_assets = iQPS_data["Total Assets"]
-synspective_data = pd.read_excel(filename2,sheet_name)
-synspective_total_assets = synspective_data["Total Assets"]
-planet_data = pd.read_excel(filename3,"consolidated")
-planet_total_assets = planet_data["Total assets"]
-print(planet_total_assets)
+keys = json.load(open(company_keys))
 
-logAssets_iQPS = np.log(iQPS_total_assets)
-logAssets_synspective = np.log(synspective_total_assets)
-logAssets_planet = np.log(planet_total_assets)
-print(logAssets_planet)
+# Set up plotting parameters outside of for loop.
+fig = plt.figure()
+ax = fig.add_subplot()
+ax.tick_params(axis='both', which='major', labelsize=12)
+legendTitle = "Company"
 
-logs_iQPS = []
-divs_iQPS = []
-logs_synspective = []
-divs_synspective = []
-logs_planet = []
-divs_planet = []
-for i in range(1, len(logAssets_iQPS)):
-    logs_iQPS.append(logAssets_iQPS[i] - logAssets_iQPS[i-1])
-    divs_iQPS.append((iQPS_total_assets[i]/iQPS_total_assets[i-1]) - 1)
-for i in range(1, len(logAssets_synspective)):
-    logs_synspective.append(logAssets_synspective[i] - logAssets_synspective[i-1])
-    divs_synspective.append(synspective_total_assets[i]/synspective_total_assets[i-1] - 1)
-for i in range(1, len(logAssets_planet)):
-    logs_planet.append(logAssets_planet[i]-logAssets_planet[i-1])
-    divs_planet.append((planet_total_assets[i]/planet_total_assets[i-1])-1)
+for i, key in enumerate(keys):
+    filename = keys[f"{key}"]["file"]
+    # TODO: fix data column names so capitalization convention
+    # is consistent across data sheets. This will eliminate the need 
+    # for the below if-else statement.
+    if key == "planet":
+        data = pd.read_excel(f"./financial_data/{filename}","consolidated")
+        totalAssets = data["Total current assets"]
+    else:
+        data = pd.read_excel(f"./financial_data/{filename}","income")
+        totalAssets = data["Total Assets"]
 
-plt.plot(iQPS_data["Quarter"][1:], logs_iQPS, synspective_data["Quarter"][1:], logs_synspective, planet_data["Quarter"][1:], logs_planet)
-plt.savefig("./images/logs.png")
-plt.plot(iQPS_data["Quarter"][1:], divs_iQPS, synspective_data["Quarter"][1:], divs_synspective, planet_data["Quarter"][1:], divs_planet)
-plt.savefig("./images/divs.png")
+    logAssets = np.log(totalAssets)
+
+    logs = []
+    divs = []
+    for i in range(1, len(logAssets)):
+        logs.append(logAssets[i] - logAssets[i-1])
+        divs.append((totalAssets[i]/totalAssets[i-1]) - 1)
+
+    companyColor = np.asarray(keys[key]["color"])/255
+    ax.plot(data["Quarter"][1:], logs, color=companyColor, linestyle=keys[key]["style"], label=key)
+
+ax.set_xlabel('Time', fontsize=12)
+ax.set_ylabel('Total Asset Growth Rate (%)', fontsize=12)
+fig.tight_layout()
+plt.rcParams['legend.title_fontsize'] = '12' 
+ax.legend(loc='upper right', title=legendTitle, fontsize='12', frameon=True)
+plt.savefig("./images/total_asset_growth_rate_logs.png")

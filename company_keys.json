@@ -1,5 +1,20 @@
-{"planet": 
-    {"file" : "planet_compiled.xlsx", 
-    "sheet" : ["income", "consolidated"]
-    }
+{
+    "planet": 
+        {"file" : "planet.xlsx", 
+        "sheet" : ["income", "consolidated"],
+        "color" : [166, 55, 166],
+        "style" : "-"
+        },
+    "synspective": 
+        {"file" : "synspective.xlsx", 
+        "sheet" : ["income"],
+        "color" : [0, 0, 178],
+        "style" : "--"
+        },
+    "iQPS":
+        {"file" : "iQPS.xlsx", 
+        "sheet" : ["income"],
+        "color" : [244, 183, 0],
+        "style" : "-."
+        }
 }
