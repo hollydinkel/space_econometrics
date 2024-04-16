@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+from statsmodels.graphics.tsaplots import plot_acf
 
 # Store company-specific parameters (plotting style, name, filename)
 # in a json dictionary for later lookup
@@ -15,6 +16,7 @@ fig = plt.figure()
 ax = fig.add_subplot()
 ax.tick_params(axis='both', which='major', labelsize=12)
 legendTitle = "Company"
+
 
 for i, key in enumerate(keys):
     filename = keys[f"{key}"]["file"]
@@ -42,6 +44,9 @@ for i, key in enumerate(keys):
 ax.set_xlabel('Time', fontsize=12)
 ax.set_ylabel('Total Asset Growth Rate (%)', fontsize=12)
 fig.tight_layout()
-plt.rcParams['legend.title_fontsize'] = '12' 
+plt.rcParams['legend.title_fontsize'] = '12'
 ax.legend(loc='upper right', title=legendTitle, fontsize='12', frameon=True)
 plt.savefig("./images/total_asset_growth_rate_logs.png")
+
+plot_acf(logAssets, lags=16, color = 'red').set_size_inches(16,6)
+plt.savefig("./images/acf_test.png")
