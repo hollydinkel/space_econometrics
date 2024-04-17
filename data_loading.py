@@ -23,7 +23,7 @@ for i, key in enumerate(keys):
     # TODO: fix data column names so capitalization convention
     # is consistent across data sheets. This will eliminate the need 
     # for the below if-else statement.
-    if key == "planet":
+    if key == "planet" or key == "satellogic":
         data = pd.read_excel(f"./financial_data/{filename}","consolidated")
         totalAssets = data["Total current assets"]
     else:
@@ -48,5 +48,5 @@ plt.rcParams['legend.title_fontsize'] = '12'
 ax.legend(loc='upper right', title=legendTitle, fontsize='12', frameon=True)
 plt.savefig("./images/total_asset_growth_rate_logs.png")
 
-plot_acf(logAssets, lags=16, color = 'red').set_size_inches(16,6)
-plt.savefig("./images/acf_test.png")
+#plot_acf(logAssets, lags=16, color = 'red').set_size_inches(16,6)
+#plt.savefig("./images/acf_test.png")
