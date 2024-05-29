@@ -25,7 +25,7 @@ keys = json.load(open(company_keys))
 fig1 = plt.figure()
 ax1 = fig1.add_subplot()
 ax1.tick_params(axis='both', which='major', labelsize=12)
-ax1.set_xlabel('Time', fontsize=12)
+ax1.set_xlabel('Year', fontsize=12)
 ax1.set_ylabel('Total Asset Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig1_path = "./images/total_asset_growth_rate.png"
@@ -33,7 +33,7 @@ fig1_path = "./images/total_asset_growth_rate.png"
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
 ax2.tick_params(axis='both', which='major', labelsize=12)
-ax2.set_xlabel('Time', fontsize=12)
+ax2.set_xlabel('Year', fontsize=12)
 ax2.set_ylabel('Total Liabilities Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig2_path = "./images/total_liabilities_growth_rate.png"
@@ -41,7 +41,7 @@ fig2_path = "./images/total_liabilities_growth_rate.png"
 fig3 = plt.figure()
 ax3 = fig3.add_subplot()
 ax3.tick_params(axis='both', which='major', labelsize=12)
-ax3.set_xlabel('Time', fontsize=12)
+ax3.set_xlabel('Year', fontsize=12)
 ax3.set_ylabel('Total Equity Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig3_path = "./images/total_equity_growth_rate.png"

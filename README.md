@@ -1,6 +1,6 @@
 # Business Innovation in Commercial Space: Culture and Trends in Earth Observation
 
-This repository contains the data and analysis code to support methods in our paper, *Business Innovation in Commercial Space: Culture and Trends in Earth Observation*, by Giulia Cambone*, Holly Dinkel*, Luca Ferrone*, KangSanKim (Antonio Stark)*, Shinsuke Kito*, Ashley Kowalski*, and Delphine Urbah*.
+This repository contains the data and analysis code to support methods in our paper, *Business Innovation in Commercial Space: Culture and Trends in Earth Observation*, by Giulia Cambone*, Holly Dinkel*, Luca Ferrone*, KangSanKim (Antonio Stark)*, Shinsuke Kito*, and Delphine Urbah*.
 
 *Denotes equal contribution.
 
@@ -24,7 +24,7 @@ git clone --recurse-submodules git@github.com:hollydinkel/space_econometrics.git
 ```bash
 @ARTICLE{
   iafipmc2024innovation,
-  author={Cambone, Giulia and Dinkel, Holly and Ferrone, Luca and Kim, KangSan and Kito, Shinsuke and Kowalski, Ashley and Urbah, Delphine},
+  author={Cambone, Giulia and Dinkel, Holly and Ferrone, Luca and Kim, KangSan and Kito, Shinsuke and Urbah, Delphine},
   journal={IAF International Astronautical Congress}, 
   title={Business Innovation in Commercial Space: Culture and Trends in Earth Observation}, 
   year={2024},
