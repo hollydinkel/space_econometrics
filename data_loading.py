@@ -10,8 +10,8 @@ from statsmodels.tsa.vector_ar.vecm import VECM
 
 def adf_test(series):
     result = adfuller(series)
-    print('ADF Statistic:', result[0])
-    print('p-value:', result[1])
+    # print('ADF Statistic:', result[0])
+    # print('p-value:', result[1])
     return result[1]
 
 # Store company-specific parameters (plotting style, name, filename)
@@ -46,6 +46,9 @@ ax3.set_ylabel('Total Equity Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig3_path = "./images/total_equity_growth_rate.png"
 
+fig4, axs = plt.subplots(2, 2, figsize=(12, 10))
+fig4_path = "./images/acf_test.png"
+
 for i, key in enumerate(keys):
     print("KEY: ", key)
     filename = keys[f"{key}"]["file"]
@@ -58,11 +61,35 @@ for i, key in enumerate(keys):
     totalLiabilities = data["Total Liabilities"]
     totalEquity = data["Total Equity"]
 
-    p_value_Assets = adf_test(totalAssets)
-    if p_value_Assets > 0.05:
-        print(f'Total Assets is non-stationary')
-    else:
-        print(f'Total Assets is stationary')
+    # Transformed data
+    diffAssets = np.diff(totalAssets)
+    diffLiabilities = np.diff(totalLiabilities)
+    diffEquity = np.diff(totalEquity)
+    diff2Assets = np.diff(np.diff(totalAssets))
+    diff2Liabilities = np.diff(np.diff(totalLiabilities))
+    diff2Equity = np.diff(np.diff(totalEquity))
+    lnAssets = np.log(totalAssets)
+    lnLiabilities = np.log(totalLiabilities)
+    lnEquity = np.log(totalEquity)
+
+    try:
+        p_value_Assets = adf_test(totalAssets)
+        if p_value_Assets > 0.05:
+            print(f'TotalAssets is non-stationary')
+            p_value_diffAssets = adf_test(diffAssets)
+            if p_value_diffAssets > 0.05:
+                print(f'diffTotalAssets is non-stationary')
+                p_value_diff2Assets = adf_test(diff2Assets)
+                if p_value_diff2Assets > 0.05:
+                    print('diff2TotalAssets is non-stationary')
+                else:
+                    print('diff2TotalAssets is stationary')
+            else:
+                print('diffTotal Assets is stationary')
+        else:
+            print('TotalAssets is stationary')
+    except:
+        print("Error")
 
     frame = np.column_stack((totalAssets,totalLiabilities))
 
@@ -97,28 +124,22 @@ for i, key in enumerate(keys):
         print(f"skipping {key} vecm")
     # print(vecm_fit.summary())
 
-    lnAssets = np.log(totalAssets)
-    lnLiabilities = np.log(totalLiabilities)
-    lnEquity = np.log(totalEquity)
-
-    logAssets = []
+    logAssets = np.diff(lnAssets)
+    logLiabilities = np.diff(lnLiabilities)
+    logEquity = np.diff(lnEquity)
     divAssets = []
-    logLiabilities = []
     divLiabilities = []
-    logEquity = []
     divEquity = []
-    for i in range(1, len(lnAssets)):
-        logAssets.append(lnAssets[i] - lnAssets[i-1])
-        divAssets.append((((totalAssets[i] - totalAssets[i-1])/totalAssets[i-1]) - 1)*100)
-        logLiabilities.append(lnLiabilities[i] - lnLiabilities[i-1])
-        divLiabilities.append((((totalLiabilities[i] - totalLiabilities[i-1])/totalLiabilities[i-1]) - 1)*100)
-        logEquity.append(lnEquity[i] - lnEquity[i-1])
-        divEquity.append((((totalEquity[i] - totalEquity[i-1])/totalEquity[i-1]) - 1)*100)
+    for j in range(1, len(lnAssets)):
+        divAssets.append(((diffAssets[j-1]/totalAssets[j-1]) - 1)*100)
+        divLiabilities.append(((diffLiabilities[j-1]/totalLiabilities[j-1]) - 1)*100)
+        divEquity.append(((diffEquity[j-1]/totalEquity[j-1]) - 1)*100)
 
     companyColor = np.asarray(keys[key]["color"])/255
     ax1.plot(data["Quarter"][1:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax2.plot(data["Quarter"][1:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax3.plot(data["Quarter"][1:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    plot_acf(logAssets, lags=3, title=key, ax = axs[i//2, i%2], color = 'red')
 
 plt.rcParams['legend.title_fontsize'] = '12'
 
@@ -147,5 +168,5 @@ ax3.legend(ncol=4, bbox_to_anchor=(1, -0.15),
 ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transAxes)
 fig3.savefig(f"{fig3_path}")
 
-# plot_acf(logAssets, lags=16, color = 'red').set_size_inches(16,6)
-# plt.savefig("./images/acf_test.png")
+fig4.tight_layout()
+fig4.savefig(f"{fig4_path}")
