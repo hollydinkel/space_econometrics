@@ -109,27 +109,42 @@ for i, key in enumerate(keys):
     divEquity = []
     for i in range(1, len(lnAssets)):
         logAssets.append(lnAssets[i] - lnAssets[i-1])
-        divAssets.append(((totalAssets[i]/totalAssets[i-1]) - 1)*100)
+        divAssets.append((((totalAssets[i] - totalAssets[i-1])/totalAssets[i-1]) - 1)*100)
         logLiabilities.append(lnLiabilities[i] - lnLiabilities[i-1])
-        divLiabilities.append(((totalLiabilities[i]/totalLiabilities[i-1]) - 1)*100)
+        divLiabilities.append((((totalLiabilities[i] - totalLiabilities[i-1])/totalLiabilities[i-1]) - 1)*100)
         logEquity.append(lnEquity[i] - lnEquity[i-1])
-        divEquity.append(((totalEquity[i]/totalEquity[i-1]) - 1)*100)
+        divEquity.append((((totalEquity[i] - totalEquity[i-1])/totalEquity[i-1]) - 1)*100)
 
     companyColor = np.asarray(keys[key]["color"])/255
-    ax1.plot(data["Quarter"][1:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key)
-    ax2.plot(data["Quarter"][1:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key)
-    ax3.plot(data["Quarter"][1:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key)
+    ax1.plot(data["Quarter"][1:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax2.plot(data["Quarter"][1:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax3.plot(data["Quarter"][1:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
 
 plt.rcParams['legend.title_fontsize'] = '12'
 
 fig1.tight_layout()
-ax1.legend(loc='upper right', title=legendTitle, fontsize='12', frameon=True)
+box1 = ax1.get_position()
+ax1.set_position([box1.x0, box1.y0 + box1.height * 0.2,
+                 box1.width, box1.height * 0.8])
+ax1.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
 fig1.savefig(f"{fig1_path}")
+
 fig2.tight_layout()
-ax2.legend(loc='upper right', title=legendTitle, fontsize='12', frameon=True)
+box2 = ax2.get_position()
+ax2.set_position([box2.x0, box2.y0 + box2.height * 0.2,
+                 box2.width, box2.height * 0.8])
+ax2.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
 fig2.savefig(f"{fig2_path}")
+
 fig3.tight_layout()
-ax3.legend(loc='upper right', title=legendTitle, fontsize='12', frameon=True)
+box3 = ax3.get_position()
+ax3.set_position([box3.x0, box3.y0 + box3.height * 0.2,
+                 box3.width, box3.height * 0.8])
+ax3.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
+ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transAxes)
 fig3.savefig(f"{fig3_path}")
 
 # plot_acf(logAssets, lags=16, color = 'red').set_size_inches(16,6)
