@@ -2,17 +2,20 @@ import pandas as pd
 import numpy as np
 import json
 import matplotlib.pyplot as plt
-from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.vector_ar.vecm import VECM
 
-def adf_test(series):
+def adf_test(series, name):
     result = adfuller(series)
     # print('ADF Statistic:', result[0])
     # print('p-value:', result[1])
-    return result[1]
+    if result[1] < 0.05:
+        print(f'{name} is stationary')
+    else:
+        print(f'{name} is non-stationary')
 
 # Store company-specific parameters (plotting style, name, filename)
 # in a json dictionary for later lookup
@@ -22,7 +25,7 @@ sheet_name = 'income'
 keys = json.load(open(company_keys))
 
 # Set up plotting parameters outside of for loop.
-fig1 = plt.figure()
+fig1 = plt.figure(dpi=300)
 ax1 = fig1.add_subplot()
 ax1.tick_params(axis='both', which='major', labelsize=12)
 ax1.set_xlabel('Year', fontsize=12)
@@ -30,7 +33,7 @@ ax1.set_ylabel('Total Asset Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig1_path = "./images/total_asset_growth_rate.png"
 
-fig2 = plt.figure()
+fig2 = plt.figure(dpi=300)
 ax2 = fig2.add_subplot()
 ax2.tick_params(axis='both', which='major', labelsize=12)
 ax2.set_xlabel('Year', fontsize=12)
@@ -38,7 +41,7 @@ ax2.set_ylabel('Total Liabilities Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig2_path = "./images/total_liabilities_growth_rate.png"
 
-fig3 = plt.figure()
+fig3 = plt.figure(dpi=300)
 ax3 = fig3.add_subplot()
 ax3.tick_params(axis='both', which='major', labelsize=12)
 ax3.set_xlabel('Year', fontsize=12)
@@ -46,8 +49,11 @@ ax3.set_ylabel('Total Equity Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig3_path = "./images/total_equity_growth_rate.png"
 
-fig4, axs = plt.subplots(2, 2, figsize=(12, 10))
+fig4, ax4 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
 fig4_path = "./images/acf_test.png"
+
+fig5, ax5 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
+fig5_path = "./images/pacf_test.png"
 
 for i, key in enumerate(keys):
     print("KEY: ", key)
@@ -72,38 +78,35 @@ for i, key in enumerate(keys):
     lnLiabilities = np.log(totalLiabilities)
     lnEquity = np.log(totalEquity)
 
+    # ADF unit root test for stationarity
     try:
-        p_value_Assets = adf_test(totalAssets)
-        if p_value_Assets > 0.05:
-            print(f'TotalAssets is non-stationary')
-            p_value_diffAssets = adf_test(diffAssets)
-            if p_value_diffAssets > 0.05:
-                print(f'diffTotalAssets is non-stationary')
-                p_value_diff2Assets = adf_test(diff2Assets)
-                if p_value_diff2Assets > 0.05:
-                    print('diff2TotalAssets is non-stationary')
-                else:
-                    print('diff2TotalAssets is stationary')
-            else:
-                print('diffTotal Assets is stationary')
-        else:
-            print('TotalAssets is stationary')
+        adf_test(totalAssets, "totalAssets")
+        adf_test(lnAssets, "lnAssets")
+        adf_test(diffAssets, "diffAssets")
+        adf_test(diff2Assets, "diff2Assets")
+        adf_test(totalLiabilities, "totalLiabilities")
+        adf_test(lnLiabilities, "lnLiabilities")
+        adf_test(diffLiabilities, "diffLiabilities")
+        adf_test(diff2Liabilities, "diff2Liabilities")
+        adf_test(totalEquity, "totalEquity")
+        adf_test(lnEquity, "lnEquity")
+        adf_test(diffEquity, "diffEquity")
+        adf_test(diff2Equity, "diff2Equity")
     except:
-        print("Error")
+        print("Error in testing for stationarity.")
 
-    frame = np.column_stack((totalAssets,totalLiabilities))
+    frame = np.column_stack((diff2Assets,diff2Liabilities,diff2Equity))
 
     try:
         # Perform Johansen cointegration test
         johansen_result = coint_johansen(frame, 0, 1)
-        print('Eigenvalues:', johansen_result.eig)
-        print('Trace Statistic:', johansen_result.lr1)
-        print('Critical Values:', johansen_result.cvt)
+        # print('Eigenvalues:', johansen_result.eig)
+        # print('Trace Statistic:', johansen_result.lr1)
+        # print('Critical Values:', johansen_result.cvt)
 
         # Determine the optimal lag length
         model = VAR(frame)
         lag_order = model.select_order()
-        print(lag_order.summary())
 
         # Choose an available criterion, e.g., 'aic', 'bic', 'hqic'
         if 'aic' in lag_order.selected_orders:
@@ -118,8 +121,9 @@ for i, key in enumerate(keys):
         print(f'Chosen lag length based on available criterion: {chosen_lag}')
 
         # coint_rank is number of non-zero eigenvalues minus 1
-        vecm = VECM(frame, k_ar_diff=chosen_lag, coint_rank=1)
+        vecm = VECM(frame, k_ar_diff=chosen_lag, coint_rank=1, dates=data["Quarter"])
         vecm_fit = vecm.fit()
+        print(vecm)
     except:
         print(f"skipping {key} vecm")
     # print(vecm_fit.summary())
@@ -139,7 +143,8 @@ for i, key in enumerate(keys):
     ax1.plot(data["Quarter"][1:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax2.plot(data["Quarter"][1:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax3.plot(data["Quarter"][1:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    plot_acf(logAssets, lags=3, title=key, ax = axs[i//2, i%2], color = 'red')
+    plot_acf(logAssets, lags=3, title=key, ax = ax4[i//2, i%2], color = 'red')
+    plot_pacf(logAssets, lags=2, title=key, ax = ax5[i//2, i%2], color = 'red')
 
 plt.rcParams['legend.title_fontsize'] = '12'
 
@@ -170,3 +175,6 @@ fig3.savefig(f"{fig3_path}")
 
 fig4.tight_layout()
 fig4.savefig(f"{fig4_path}")
+
+fig5.tight_layout()
+fig5.savefig(f"{fig5_path}")
