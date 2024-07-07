@@ -3,25 +3,10 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.vector_ar.vecm import coint_johansen
-from statsmodels.tsa.api import VAR
-from statsmodels.tsa.vector_ar.vecm import VECM
+from utils import *
 
-def adf_test(series, name):
-    result = adfuller(series)
-    # print('ADF Statistic:', result[0])
-    # print('p-value:', result[1])
-    if result[1] < 0.05:
-        print(f'{name} is stationary')
-    else:
-        print(f'{name} is non-stationary')
-
-# Store company-specific parameters (plotting style, name, filename)
-# in a json dictionary for later lookup
-company_keys = './company_keys.json'
-sheet_name = 'consolidated'
-
+# Lookup company-specific parameters from dictionary (plotting style, name, filename)
+company_keys = './financial_data/company_keys.json'
 keys = json.load(open(company_keys))
 
 # Set up plotting parameters outside of for loop.
@@ -59,18 +44,35 @@ for i, key in enumerate(keys):
     print("KEY: ", key)
     filename = keys[f"{key}"]["file"]
     data = pd.read_excel(f"./financial_data/{filename}","consolidated")
-        
-    totalAssets = data["Total Assets"]
-    totalLiabilities = data["Total Liabilities"]
-    totalEquity = data["Total Equity"]
+
+    start_date = pd.to_datetime(keys[f"{key}"]["start_date"])
+    end_date = pd.to_datetime(keys[f"{key}"]["end_date"])
+    data['Quarter'] = pd.to_datetime(data['Quarter'])
+
+    filtered_data = data[data['Quarter'].between(start_date, end_date)]
+    
+    totalAssets = filtered_data["Total Assets"].values
+    totalLiabilities = filtered_data["Total Liabilities"].values
+    totalEquity = filtered_data["Total Equity"].values
+    if key == "synspective" or key == "satellogic":
+        print("not enough revenue data")
+    else:
+        revenue = filtered_data["Revenue"].values
+        diffRevenue = np.diff(revenue)
+        diff2Revenue = np.diff(diffRevenue)
+        lnRevenue = np.log(revenue)
+        adf_test(revenue, "revenue")
+        adf_test(lnRevenue, "lnRevenue")
+        adf_test(diffRevenue, "diffRevenue")
+        adf_test(diff2Revenue, "diff2Revenue")
 
     # Transformed data
     diffAssets = np.diff(totalAssets)
     diffLiabilities = np.diff(totalLiabilities)
     diffEquity = np.diff(totalEquity)
     diff2Assets = np.diff(np.diff(totalAssets))
-    diff2Liabilities = np.diff(np.diff(totalLiabilities))
-    diff2Equity = np.diff(np.diff(totalEquity))
+    diff2Liabilities = np.diff(diffLiabilities)
+    diff2Equity = np.diff(diffEquity)
     lnAssets = np.log(totalAssets)
     lnLiabilities = np.log(totalLiabilities)
     lnEquity = np.log(totalEquity)
@@ -92,38 +94,14 @@ for i, key in enumerate(keys):
     except:
         print("Error in testing for stationarity.")
 
-    frame = np.column_stack((diff2Assets,diff2Liabilities,diff2Equity))
+    frame = np.column_stack((diffAssets,diffLiabilities))
 
     try:
-        # Perform Johansen cointegration test
-        johansen_result = coint_johansen(frame, 0, 1)
-        # print('Eigenvalues:', johansen_result.eig)
-        # print('Trace Statistic:', johansen_result.lr1)
-        # print('Critical Values:', johansen_result.cvt)
-
-        # Determine the optimal lag length
-        model = VAR(frame)
-        lag_order = model.select_order()
-
-        # Choose an available criterion, e.g., 'aic', 'bic', 'hqic'
-        if 'aic' in lag_order.selected_orders:
-            chosen_lag = lag_order.selected_orders['aic']
-        elif 'bic' in lag_order.selected_orders:
-            chosen_lag = lag_order.selected_orders['bic']
-        elif 'hqic' in lag_order.selected_orders:
-            chosen_lag = lag_order.selected_orders['hqic']
-        else:
-            raise ValueError("No valid criterion found in the selected orders.")
-
-        print(f'Chosen lag length based on available criterion: {chosen_lag}')
-
-        # coint_rank is number of non-zero eigenvalues minus 1
-        vecm = VECM(frame, k_ar_diff=chosen_lag, coint_rank=1, dates=data["Quarter"])
-        vecm_fit = vecm.fit()
+        vecm = johansen_vecm(filtered_data["Quarter"][2:], frame)
+        print(vecm.summary())
     except:
         print(f"skipping {key} vecm")
-    # print(vecm_fit.summary())
-
+    
     logAssets = np.diff(lnAssets)
     logLiabilities = np.diff(lnLiabilities)
     logEquity = np.diff(lnEquity)
@@ -131,14 +109,14 @@ for i, key in enumerate(keys):
     divLiabilities = []
     divEquity = []
     for j in range(1, len(diffAssets)):
-        divAssets.append(((diffAssets[j]/totalAssets[j-1]))*100)
-        divLiabilities.append(((diffLiabilities[j]/totalLiabilities[j-1]))*100)
-        divEquity.append(((diffEquity[j]/totalEquity[j-1]))*100)
+        divAssets.append((diffAssets[j]/totalAssets[j-1])*100)
+        divLiabilities.append((diffLiabilities[j]/totalLiabilities[j-1])*100)
+        divEquity.append((diffEquity[j]/totalEquity[j-1])*100)
 
     companyColor = np.asarray(keys[key]["color"])/255
-    ax1.plot(data["Quarter"][2:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    ax2.plot(data["Quarter"][2:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    ax3.plot(data["Quarter"][2:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax1.plot(filtered_data["Quarter"][2:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax2.plot(filtered_data["Quarter"][2:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax3.plot(filtered_data["Quarter"][2:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     plot_acf(logAssets, lags=3, title=key, ax = ax4[i//2, i%2], color = 'red')
     plot_pacf(logAssets, lags=2, title=key, ax = ax5[i//2, i%2], color = 'red')
 

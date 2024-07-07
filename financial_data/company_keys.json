@@ -1,25 +1,33 @@
 {
     "planet":
         {"file" : "planet.xlsx",
-        "sheet" : ["income", "consolidated"],
+        "start_date" : "2021-01-31",
+        "end_date" : "2024-04-30",
+        "sheet" : ["consolidated"],
         "color" : [166, 55, 166],
         "style" : "-"
         },
     "synspective":
         {"file" : "synspective.xlsx",
-        "sheet" : ["income"],
+        "start_date" : "2018-12-31",
+        "end_date" : "2022-12-31",
+        "sheet" : ["consolidated"],
         "color" : [0, 0, 178],
         "style" : "--"
         },
     "iQPS":
         {"file" : "iQPS.xlsx",
-        "sheet" : ["income"],
+        "start_date" : "2019-08-31",
+        "end_date" : "2023-05-31",
+        "sheet" : ["consolidated"],
         "color" : [244, 183, 0],
         "style" : "-."
         },
     "satellogic":
         {"file" : "satellogic.xlsx",
-        "sheet" : ["income, consolidated"],
+        "start_date" : "2021-12-31",
+        "end_date" : "2022-12-31",
+        "sheet" : ["consolidated"],
 	"color" : [233, 0, 233],
 	"style" : "dotted"
 	}
