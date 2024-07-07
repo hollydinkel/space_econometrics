@@ -20,7 +20,7 @@ def adf_test(series, name):
 # Store company-specific parameters (plotting style, name, filename)
 # in a json dictionary for later lookup
 company_keys = './company_keys.json'
-sheet_name = 'income'
+sheet_name = 'consolidated'
 
 keys = json.load(open(company_keys))
 
@@ -58,10 +58,7 @@ fig5_path = "./images/pacf_test.png"
 for i, key in enumerate(keys):
     print("KEY: ", key)
     filename = keys[f"{key}"]["file"]
-    if (key == "planet" or key == "satellogic"):
-        data = pd.read_excel(f"./financial_data/{filename}","consolidated")
-    else:
-        data = pd.read_excel(f"./financial_data/{filename}","income")
+    data = pd.read_excel(f"./financial_data/{filename}","consolidated")
         
     totalAssets = data["Total Assets"]
     totalLiabilities = data["Total Liabilities"]
@@ -123,7 +120,6 @@ for i, key in enumerate(keys):
         # coint_rank is number of non-zero eigenvalues minus 1
         vecm = VECM(frame, k_ar_diff=chosen_lag, coint_rank=1, dates=data["Quarter"])
         vecm_fit = vecm.fit()
-        print(vecm)
     except:
         print(f"skipping {key} vecm")
     # print(vecm_fit.summary())
@@ -134,15 +130,15 @@ for i, key in enumerate(keys):
     divAssets = []
     divLiabilities = []
     divEquity = []
-    for j in range(1, len(lnAssets)):
-        divAssets.append(((diffAssets[j-1]/totalAssets[j-1]) - 1)*100)
-        divLiabilities.append(((diffLiabilities[j-1]/totalLiabilities[j-1]) - 1)*100)
-        divEquity.append(((diffEquity[j-1]/totalEquity[j-1]) - 1)*100)
+    for j in range(1, len(diffAssets)):
+        divAssets.append(((diffAssets[j]/totalAssets[j-1]))*100)
+        divLiabilities.append(((diffLiabilities[j]/totalLiabilities[j-1]))*100)
+        divEquity.append(((diffEquity[j]/totalEquity[j-1]))*100)
 
     companyColor = np.asarray(keys[key]["color"])/255
-    ax1.plot(data["Quarter"][1:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    ax2.plot(data["Quarter"][1:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    ax3.plot(data["Quarter"][1:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax1.plot(data["Quarter"][2:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax2.plot(data["Quarter"][2:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax3.plot(data["Quarter"][2:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     plot_acf(logAssets, lags=3, title=key, ax = ax4[i//2, i%2], color = 'red')
     plot_pacf(logAssets, lags=2, title=key, ax = ax5[i//2, i%2], color = 'red')
 
@@ -170,7 +166,7 @@ ax3.set_position([box3.x0, box3.y0 + box3.height * 0.2,
                  box3.width, box3.height * 0.8])
 ax3.legend(ncol=4, bbox_to_anchor=(1, -0.15),
           fancybox=True, title=legendTitle, fontsize='12', frameon=True)
-ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transAxes)
+# ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transAxes)
 fig3.savefig(f"{fig3_path}")
 
 fig4.tight_layout()
