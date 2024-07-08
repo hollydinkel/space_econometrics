@@ -54,69 +54,90 @@ for i, key in enumerate(keys):
     totalAssets = filtered_data["Total Assets"].values
     totalLiabilities = filtered_data["Total Liabilities"].values
     totalEquity = filtered_data["Total Equity"].values
-    if key == "synspective" or key == "satellogic":
-        print("not enough revenue data")
-    else:
-        revenue = filtered_data["Revenue"].values
-        diffRevenue = np.diff(revenue)
-        diff2Revenue = np.diff(diffRevenue)
-        lnRevenue = np.log(revenue)
-        adf_test(revenue, "revenue")
-        adf_test(lnRevenue, "lnRevenue")
-        adf_test(diffRevenue, "diffRevenue")
-        adf_test(diff2Revenue, "diff2Revenue")
 
     # Transformed data
-    diffAssets = np.diff(totalAssets)
-    diffLiabilities = np.diff(totalLiabilities)
-    diffEquity = np.diff(totalEquity)
-    diff2Assets = np.diff(np.diff(totalAssets))
-    diff2Liabilities = np.diff(diffLiabilities)
-    diff2Equity = np.diff(diffEquity)
-    lnAssets = np.log(totalAssets)
-    lnLiabilities = np.log(totalLiabilities)
-    lnEquity = np.log(totalEquity)
+    transformed_data = {"totalAssets": totalAssets,
+                        "totalLiabilities": totalLiabilities,
+                        "totalEquity": totalEquity,
+                        "diffAssets": np.diff(totalAssets),
+                        "diffLiabilities": np.diff(totalLiabilities),
+                        "diffEquity": np.diff(totalEquity),
+                        "diff2Assets": np.diff(np.diff(totalAssets)),
+                        "diff2Liabilities": np.diff(np.diff(totalLiabilities)),
+                        "diff2Equity": np.diff(np.diff(totalEquity)),
+                        "lnAssets": np.log(totalAssets),
+                        "lnLiabilities": np.log(totalLiabilities),
+                        "lnEquity": np.log(totalEquity),
+                        "growthAssets": (np.diff(totalAssets)/totalAssets[1:])*100,
+                        "growthLiabilities": (np.diff(totalLiabilities)/totalLiabilities[1:])*100,
+                        "growthEquity": (np.diff(totalEquity)/totalEquity[1:])*100,
+                        }
+
+    if key == "synspective" or key == "satellogic":
+        print("Not enough revenue data")
+    else:
+        revenue = filtered_data["Revenue"].values
+        transformed_data["Revenue"] = revenue
+        transformed_data["lnRevenue"] = np.log(revenue)
+        transformed_data["diffRevenue"] = np.diff(revenue)
+        transformed_data["diff2Revenue"] = np.diff(np.diff(revenue))
+        transformed_data["growthRevenue"] = (np.diff(revenue)/revenue[1:])*100
 
     # ADF unit root test for stationarity
-    try:
-        adf_test(totalAssets, "totalAssets")
-        adf_test(lnAssets, "lnAssets")
-        adf_test(diffAssets, "diffAssets")
-        adf_test(diff2Assets, "diff2Assets")
-        adf_test(totalLiabilities, "totalLiabilities")
-        adf_test(lnLiabilities, "lnLiabilities")
-        adf_test(diffLiabilities, "diffLiabilities")
-        adf_test(diff2Liabilities, "diff2Liabilities")
-        adf_test(totalEquity, "totalEquity")
-        adf_test(lnEquity, "lnEquity")
-        adf_test(diffEquity, "diffEquity")
-        adf_test(diff2Equity, "diff2Equity")
-    except:
-        print("Error in testing for stationarity.")
+    stationary_vars = []
+    nonstationary_vars = []
+    error_list = []
+    for idx, dtype in enumerate(transformed_data):
+        try:
+            stationarity = adf_test(transformed_data[dtype], dtype)
+            if stationarity:
+                stationary_vars.append(dtype)
+            else:
+                nonstationary_vars.append(dtype)
+        except:
+            error_list.append(dtype)
+            # print("Error in testing for stationarity, ", f"{dtype}: ", transformed_data[dtype])
+    print("Stationary variables: ", stationary_vars)
+    print("Nonstationary variables: ", nonstationary_vars)
+    print("Error testing for stationarity: ", error_list)
 
-    frame = np.column_stack((diffAssets,diffLiabilities))
+    if key == "planet":
+        date_range = filtered_data["Quarter"][1:]
+        frame = np.column_stack((transformed_data["diffRevenue"], transformed_data["diffAssets"], transformed_data["diffEquity"]))
+    elif key == "synspective":
+        date_range = filtered_data["Quarter"][1:]
+        frame = np.column_stack((transformed_data['diffAssets'],transformed_data['diffEquity'],transformed_data['diffLiabilities']))
+    elif key == "iQPS":
+        # date_range = filtered_data["Quarter"][1:]
+        # frame = np.column_stack((transformed_data["lnAssets"], transformed_data["lnEquity"], transformed_data["lnLiabilities"]))
+        date_range = filtered_data["Quarter"][2:]
+        frame = np.column_stack((transformed_data["diff2Assets"], transformed_data["diff2Liabilities"], transformed_data["diff2Equity"]))
+        # # why won't this work?
+        # date_range = filtered_data["Quarter"][:].values
+        # frame = np.column_stack((transformed_data["totalAssets"], transformed_data["totalEquity"], transformed_data["totalLiabilities"]))
+        print(date_range, frame)
+    elif key == "satellogic":
+        date_range = filtered_data["Quarter"][:]
+        frame = np.column_stack((transformed_data["totalAssets"], transformed_data["totalEquity"], transformed_data["totalLiabilities"]))
 
     try:
-        vecm = johansen_vecm(filtered_data["Quarter"][2:], frame)
-        print(vecm.summary())
+        vecm = johansen_vecm(date_range, frame)
+        print("VECM Summary: ", vecm.summary())
+        print("Gamma: ", vecm.gamma)
+        print("Alpha: ", vecm.alpha)
+        print("Beta: ", vecm.beta)
+        print("Var_rep: ", vecm.var_rep)
     except:
         print(f"skipping {key} vecm")
     
-    logAssets = np.diff(lnAssets)
-    logLiabilities = np.diff(lnLiabilities)
-    logEquity = np.diff(lnEquity)
-    divAssets = []
-    divLiabilities = []
-    divEquity = []
-    for j in range(1, len(diffAssets)):
-        divAssets.append((diffAssets[j]/totalAssets[j-1])*100)
-        divLiabilities.append((diffLiabilities[j]/totalLiabilities[j-1])*100)
-        divEquity.append((diffEquity[j]/totalEquity[j-1])*100)
+    logAssets = np.diff(transformed_data["lnAssets"])
+    logLiabilities = np.diff(transformed_data["lnLiabilities"])
+    logEquity = np.diff(transformed_data["lnEquity"])
 
     companyColor = np.asarray(keys[key]["color"])/255
-    ax1.plot(filtered_data["Quarter"][2:], divAssets, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    ax2.plot(filtered_data["Quarter"][2:], divLiabilities, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    ax3.plot(filtered_data["Quarter"][2:], divEquity, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax1.plot(filtered_data["Quarter"].values[1:], transformed_data["growthAssets"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax2.plot(filtered_data["Quarter"].values[1:], transformed_data["growthLiabilities"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    ax3.plot(filtered_data["Quarter"].values[1:], transformed_data["growthEquity"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     plot_acf(logAssets, lags=3, title=key, ax = ax4[i//2, i%2], color = 'red')
     plot_pacf(logAssets, lags=2, title=key, ax = ax5[i//2, i%2], color = 'red')
 
@@ -144,7 +165,7 @@ ax3.set_position([box3.x0, box3.y0 + box3.height * 0.2,
                  box3.width, box3.height * 0.8])
 ax3.legend(ncol=4, bbox_to_anchor=(1, -0.15),
           fancybox=True, title=legendTitle, fontsize='12', frameon=True)
-# ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transAxes)
+ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transAxes)
 fig3.savefig(f"{fig3_path}")
 
 fig4.tight_layout()

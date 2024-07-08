@@ -18,7 +18,7 @@
     "iQPS":
         {"file" : "iQPS.xlsx",
         "start_date" : "2019-08-31",
-        "end_date" : "2023-05-31",
+        "end_date" : "2024-02-29",
         "sheet" : ["consolidated"],
         "color" : [244, 183, 0],
         "style" : "-."
