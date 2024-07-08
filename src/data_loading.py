@@ -34,11 +34,27 @@ ax3.set_ylabel('Total Equity Growth Rate (%)', fontsize=12)
 legendTitle = "Company"
 fig3_path = "./images/total_equity_growth_rate.png"
 
-fig4, ax4 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig4_path = "./images/acf_test.png"
+fig4 = plt.figure(dpi=300)
+ax4 = fig4.add_subplot()
+ax4.tick_params(axis='both', which='major', labelsize=12)
+ax4.set_xlabel('Year', fontsize=12)
+ax4.set_ylabel('Financial Leverage', fontsize=12)
+legendTitle = "Company"
+fig4_path = "./images/financial_leverage.png"
 
-fig5, ax5 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig5_path = "./images/pacf_test.png"
+fig5 = plt.figure(dpi=300)
+ax5 = fig5.add_subplot()
+ax5.tick_params(axis='both', which='major', labelsize=12)
+ax5.set_xlabel('Year', fontsize=12)
+ax5.set_ylabel('Return on Equity', fontsize=12)
+legendTitle = "Company"
+fig5_path = "./images/roe.png"
+
+# fig5, ax5 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
+# fig5_path = "./images/acf_test.png"
+
+# fig6, ax6 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
+# fig6_path = "./images/pacf_test.png"
 
 for i, key in enumerate(keys):
     print("KEY: ", key)
@@ -138,8 +154,19 @@ for i, key in enumerate(keys):
     ax1.plot(filtered_data["Quarter"].values[1:], transformed_data["growthAssets"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax2.plot(filtered_data["Quarter"].values[1:], transformed_data["growthLiabilities"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax3.plot(filtered_data["Quarter"].values[1:], transformed_data["growthEquity"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
-    plot_acf(logAssets, lags=3, title=key, ax = ax4[i//2, i%2], color = 'red')
-    plot_pacf(logAssets, lags=2, title=key, ax = ax5[i//2, i%2], color = 'red')
+    ax4.plot(filtered_data["Quarter"].values[:], transformed_data["totalAssets"]/transformed_data["totalEquity"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+    
+    if key == "synspective" or key == "satellogic":
+        continue
+    else:
+        financial_leverage = transformed_data["totalAssets"]/transformed_data["totalEquity"]
+        asset_turnover = transformed_data["Revenue"]/transformed_data["totalAssets"]
+        net_profit_margin = filtered_data["Net loss"]/filtered_data["Revenue"] # net loss is the negative way of viewing net profit, so they are the same
+        roe = net_profit_margin*asset_turnover*financial_leverage
+        ax5.plot(filtered_data["Quarter"].values[:], roe, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+
+    # plot_acf(logAssets, lags=3, title=key, ax = ax5[i//2, i%2], color = 'red')
+    # plot_pacf(logAssets, lags=2, title=key, ax = ax6[i//2, i%2], color = 'red')
 
 plt.rcParams['legend.title_fontsize'] = '12'
 
@@ -169,7 +196,23 @@ ax3.text(0.65, 0.96, 'SATL moves to U.S.A.', weight='bold', transform=ax3.transA
 fig3.savefig(f"{fig3_path}")
 
 fig4.tight_layout()
+box4 = ax4.get_position()
+ax4.set_position([box4.x0, box4.y0 + box4.height * 0.2,
+                 box4.width, box4.height * 0.8])
+ax4.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
 fig4.savefig(f"{fig4_path}")
 
 fig5.tight_layout()
+box5 = ax5.get_position()
+ax5.set_position([box5.x0, box5.y0 + box5.height * 0.2,
+                 box5.width, box5.height * 0.8])
+ax5.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
 fig5.savefig(f"{fig5_path}")
+
+# fig5.tight_layout()
+# fig5.savefig(f"{fig5_path}")
+
+# fig6.tight_layout()
+# fig6.savefig(f"{fig6_path}")
