@@ -67,9 +67,9 @@ for i, key in enumerate(keys):
 
     filtered_data = data[data['Quarter'].between(start_date, end_date)]
     
-    totalAssets = filtered_data["Total Assets"].values
-    totalLiabilities = filtered_data["Total Liabilities"].values
-    totalEquity = filtered_data["Total Equity"].values
+    totalAssets = filtered_data["Total Assets"].values.astype(int)
+    totalLiabilities = filtered_data["Total Liabilities"].values.astype(int)
+    totalEquity = filtered_data["Total Equity"].values.astype(int)
 
     # Transformed data
     transformed_data = {"totalAssets": totalAssets,
@@ -89,10 +89,10 @@ for i, key in enumerate(keys):
                         "growthEquity": (np.diff(totalEquity)/totalEquity[1:])*100,
                         }
 
-    if key == "synspective" or key == "satellogic":
+    if key == "synspective":
         print("Not enough revenue data")
     else:
-        revenue = filtered_data["Revenue"].values
+        revenue = filtered_data["Revenue"].values.astype(int)
         transformed_data["Revenue"] = revenue
         transformed_data["lnRevenue"] = np.log(revenue)
         transformed_data["diffRevenue"] = np.diff(revenue)
@@ -156,7 +156,7 @@ for i, key in enumerate(keys):
     ax3.plot(filtered_data["Quarter"].values[1:], transformed_data["growthEquity"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     ax4.plot(filtered_data["Quarter"].values[:], transformed_data["totalAssets"]/transformed_data["totalEquity"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
     
-    if key == "synspective" or key == "satellogic":
+    if key == "synspective":
         continue
     else:
         financial_leverage = transformed_data["totalAssets"]/transformed_data["totalEquity"]
