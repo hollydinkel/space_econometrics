@@ -5,9 +5,9 @@ This repository contains the data and analysis code to support methods in our pa
 *Denotes equal contribution.
 
 <p align="center">
-  <img src="images/total_asset_growth_rate.png" width="194" title="Total Asset Growth Rate">
-  <img src="images/total_equity_growth_rate.png" width="194" title="Total Equity Growth Rate">
-  <img src="images/total_liabilities_growth_rate.png" width="194" title="Total Liabilities Growth Rate">
+  <img src="images/total_asset_growth_rate.png" width="250" title="Total Asset Growth Rate">
+  <img src="images/total_equity_growth_rate.png" width="250" title="Total Equity Growth Rate">
+  <img src="images/total_liabilities_growth_rate.png" width="250" title="Total Liabilities Growth Rate">
 </p>
 
 ## Dependencies
