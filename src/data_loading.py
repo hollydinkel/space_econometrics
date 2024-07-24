@@ -8,6 +8,9 @@ from utils import *
 # Lookup company-specific parameters from dictionary (plotting style, name, filename)
 company_keys = './financial_data/company_keys.json'
 keys = json.load(open(company_keys))
+exchange_rate_file = './financial_data/dollar-yen-exchange-rate-history.csv'
+exchange_rate = pd.read_csv(exchange_rate_file, header=None, names=['Date', 'Value'])
+exchange_rate['Date'] = pd.to_datetime(exchange_rate['Date'])
 
 # Set up plotting parameters outside of for loop.
 fig1 = plt.figure(dpi=300)
@@ -50,11 +53,29 @@ ax5.set_ylabel('Return on Equity', fontsize=12)
 legendTitle = "Company"
 fig5_path = "./images/roe.png"
 
+fig6 = plt.figure(dpi=300)
+ax6 = fig6.add_subplot()
+ax6.tick_params(axis='both', which='major', labelsize=12)
+ax6.set_xlabel('Year', fontsize=12)
+ax6.set_ylabel('Revenue ($USD)', fontsize=12)
+legendTitle = "Company"
+fig6_path = "./images/revenue.png"
+
+fig7 = plt.figure(dpi=300)
+ax7 = fig7.add_subplot()
+ax7.tick_params(axis='both', which='major', labelsize=12)
+ax7.set_xlabel('Year', fontsize=12)
+ax7.set_ylabel('Total Asset Turnover', fontsize=12)
+legendTitle = "Company"
+fig7_path = "./images/total_asset_turnover.png"
+
 # fig5, ax5 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
 # fig5_path = "./images/acf_test.png"
 
 # fig6, ax6 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
 # fig6_path = "./images/pacf_test.png"
+
+# c = CurrencyRates()
 
 for i, key in enumerate(keys):
     print("KEY: ", key)
@@ -98,6 +119,10 @@ for i, key in enumerate(keys):
         transformed_data["diffRevenue"] = np.diff(revenue)
         transformed_data["diff2Revenue"] = np.diff(np.diff(revenue))
         transformed_data["growthRevenue"] = (np.diff(revenue)/revenue[1:])*100
+        if key == "iQPS":
+            # Merge filtered_data with exchange_rate_data based on dates
+            merged_data = pd.merge(filtered_data, exchange_rate, left_on='Quarter', right_on='Date', how='left')
+            merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
 
     # ADF unit root test for stationarity
     stationary_vars = []
@@ -113,9 +138,9 @@ for i, key in enumerate(keys):
         except:
             error_list.append(dtype)
             # print("Error in testing for stationarity, ", f"{dtype}: ", transformed_data[dtype])
-    print("Stationary variables: ", stationary_vars)
-    print("Nonstationary variables: ", nonstationary_vars)
-    print("Error testing for stationarity: ", error_list)
+    # print("Stationary variables: ", stationary_vars)
+    # print("Nonstationary variables: ", nonstationary_vars)
+    # print("Error testing for stationarity: ", error_list)
 
     if key == "planet":
         date_range = filtered_data["Quarter"][1:]
@@ -131,18 +156,18 @@ for i, key in enumerate(keys):
         # # why won't this work?
         # date_range = filtered_data["Quarter"][:].values
         # frame = np.column_stack((transformed_data["totalAssets"], transformed_data["totalEquity"], transformed_data["totalLiabilities"]))
-        print(date_range, frame)
+        # print(date_range, frame)
     elif key == "satellogic":
         date_range = filtered_data["Quarter"][:]
         frame = np.column_stack((transformed_data["totalAssets"], transformed_data["totalEquity"], transformed_data["totalLiabilities"]))
 
     try:
         vecm = johansen_vecm(date_range, frame)
-        print("VECM Summary: ", vecm.summary())
-        print("Gamma: ", vecm.gamma)
-        print("Alpha: ", vecm.alpha)
-        print("Beta: ", vecm.beta)
-        print("Var_rep: ", vecm.var_rep)
+        # print("VECM Summary: ", vecm.summary())
+        # print("Gamma: ", vecm.gamma)
+        # print("Alpha: ", vecm.alpha)
+        # print("Beta: ", vecm.beta)
+        # print("Var_rep: ", vecm.var_rep)
     except:
         print(f"skipping {key} vecm")
     
@@ -164,6 +189,12 @@ for i, key in enumerate(keys):
         net_profit_margin = filtered_data["Net loss"]/filtered_data["Revenue"] # net loss is the negative way of viewing net profit, so they are the same
         roe = net_profit_margin*asset_turnover*financial_leverage
         ax5.plot(filtered_data["Quarter"].values[:], roe, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+        if key == "iQPS":
+            ax6.plot(merged_data["Quarter"].values[:], merged_data["Revenue_USD"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+        else:
+            ax6.plot(filtered_data["Quarter"].values[:], transformed_data["Revenue"], color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+        ax7.plot(filtered_data["Quarter"].values[:], asset_turnover, color=companyColor, linestyle=keys[key]["style"], label=key, linewidth=4)
+
 
     # plot_acf(logAssets, lags=3, title=key, ax = ax5[i//2, i%2], color = 'red')
     # plot_pacf(logAssets, lags=2, title=key, ax = ax6[i//2, i%2], color = 'red')
@@ -210,6 +241,22 @@ ax5.set_position([box5.x0, box5.y0 + box5.height * 0.2,
 ax5.legend(ncol=4, bbox_to_anchor=(1, -0.15),
           fancybox=True, title=legendTitle, fontsize='12', frameon=True)
 fig5.savefig(f"{fig5_path}")
+
+fig6.tight_layout()
+box6 = ax6.get_position()
+ax6.set_position([box6.x0, box6.y0 + box6.height * 0.2,
+                 box6.width, box6.height * 0.8])
+ax6.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
+fig6.savefig(f"{fig6_path}")
+
+fig7.tight_layout()
+box7 = ax6.get_position()
+ax7.set_position([box7.x0, box7.y0 + box7.height * 0.2,
+                 box7.width, box7.height * 0.8])
+ax7.legend(ncol=4, bbox_to_anchor=(1, -0.15),
+          fancybox=True, title=legendTitle, fontsize='12', frameon=True)
+fig7.savefig(f"{fig7_path}")
 
 # fig5.tight_layout()
 # fig5.savefig(f"{fig5_path}")
