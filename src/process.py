@@ -49,7 +49,7 @@ def transform_financial_metrics(company, filtered_data):
         "diffLogLiabilities": diffLogLiabilities,
         "diffLogEquity": diffLogEquity
     }
-    if company == "synspective":
+    if company == "Synspective":
             print("Not enough revenue data")
     else:
         revenue = filtered_data["Revenue"].values.astype(int)
@@ -77,18 +77,18 @@ exchange_rate_file = './financial_data/dollar-yen-exchange-rate-history.csv'
 exchange_rate = pd.read_csv(exchange_rate_file, header=None, names=['Date', 'Value'])
 exchange_rate['Date'] = pd.to_datetime(exchange_rate['Date'])
 
-fig1, ax1 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig2, ax2 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig21, ax21 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig22, ax22 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig23, ax23 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig24, ax24 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig25, ax25 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig26, ax26 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig27, ax27 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig28, ax28 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig29, ax29 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-fig30, ax30 = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
+fig1, ax1 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig2, ax2 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig21, ax21 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig22, ax22 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig23, ax23 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig24, ax24 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig25, ax25 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig26, ax26 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig27, ax27 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig28, ax28 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig29, ax29 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig30, ax30 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
 fig3, ax3 = plt.subplots(figsize=(10, 6), dpi=300)
 fig4, ax4 = plt.subplots(figsize=(10, 6), dpi=300)
 fig5, ax5 = plt.subplots(figsize=(10, 6), dpi=300)
@@ -115,24 +115,24 @@ for i, company in enumerate(company_metadata):
     transformed_data = transform_financial_metrics(company, filtered_data)
     company_color = np.asarray(company_metadata[company]["color"]) / 255 # normalized color coordinates
 
-    plot_acf(transformed_data["lnAssets"], lags=3, title=company, ax = ax1[i//2, i%2], color = 'red')
-    plot_pacf(transformed_data["lnAssets"], lags=2, title=company, ax = ax2[i//2, i%2], color = 'red')
-    plot_acf(transformed_data["lnLiabilities"], lags=3, title=company, ax = ax21[i//2, i%2], color = 'red')
-    plot_pacf(transformed_data["lnLiabilities"], lags=3, title=company, ax = ax22[i//2, i%2], color = 'red')
-    plot_acf(transformed_data["lnEquity"], lags=3, title=company, ax = ax23[i//2, i%2], color = 'red')
-    plot_pacf(transformed_data["lnEquity"], lags=3, title=company, ax = ax24[i//2, i%2], color = 'red')
-    plot_acf(transformed_data["diffAssets"], lags=3, title=company, ax = ax25[i//2, i%2], color = 'red')
-    plot_pacf(transformed_data["diffAssets"], lags=2, title=company, ax = ax26[i//2, i%2], color = 'red')
-    plot_acf(transformed_data["diffLiabilities"], lags=3, title=company, ax = ax27[i//2, i%2], color = 'red')
-    plot_pacf(transformed_data["diffLiabilities"], lags=2, title=company, ax = ax28[i//2, i%2], color = 'red')
-    plot_acf(transformed_data["diffEquity"], lags=3, title=company, ax = ax29[i//2, i%2], color = 'red')
-    plot_pacf(transformed_data["diffEquity"], lags=2, title=company, ax = ax30[i//2, i%2], color = 'red')
+    plot_acf(transformed_data["lnAssets"], lags=3, title=company, ax = ax1[i//3, i%3], color = 'red')
+    plot_pacf(transformed_data["lnAssets"], lags=2, title=company, ax = ax2[i//3, i%3], color = 'red')
+    plot_acf(transformed_data["lnLiabilities"], lags=3, title=company, ax = ax21[i//3, i%3], color = 'red')
+    plot_pacf(transformed_data["lnLiabilities"], lags=3, title=company, ax = ax22[i//3, i%3], color = 'red')
+    plot_acf(transformed_data["lnEquity"], lags=3, title=company, ax = ax23[i//3, i%3], color = 'red')
+    plot_pacf(transformed_data["lnEquity"], lags=3, title=company, ax = ax24[i//3, i%3], color = 'red')
+    plot_acf(transformed_data["diffAssets"], lags=3, title=company, ax = ax25[i//3, i%3], color = 'red')
+    plot_pacf(transformed_data["diffAssets"], lags=2, title=company, ax = ax26[i//3, i%3], color = 'red')
+    plot_acf(transformed_data["diffLiabilities"], lags=3, title=company, ax = ax27[i//3, i%3], color = 'red')
+    plot_pacf(transformed_data["diffLiabilities"], lags=2, title=company, ax = ax28[i//3, i%3], color = 'red')
+    plot_acf(transformed_data["diffEquity"], lags=3, title=company, ax = ax29[i//3, i%3], color = 'red')
+    plot_pacf(transformed_data["diffEquity"], lags=2, title=company, ax = ax30[i//3, i%3], color = 'red')
 
     fig3 = plot_growth_rate(fig3, ax3, transformed_data, "growthAssets", company_metadata, company, 'Total Asset Growth Rate (%)')
     fig4 = plot_growth_rate(fig4, ax4, transformed_data, "growthLiabilities", company_metadata, company, 'Total Liabilities Growth Rate (%)')
     fig5 = plot_growth_rate(fig5, ax5, transformed_data, "growthEquity", company_metadata, company, 'Total Equity Growth Rate (%)')
 
-    if company == "synspective":
+    if company == "Synspective":
         continue
     else:
         fig6 = plot_kpis(fig6, ax6, transformed_data, "financialLeverage", company_metadata, company, 'Financial Leverage')
