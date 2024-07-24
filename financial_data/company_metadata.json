@@ -5,7 +5,7 @@
         "end_date" : "2023-05-31",
         "sheet" : ["consolidated"],
         "color" : [0, 96, 176],
-        "style" : ":"
+        "style" : "solid"
         },
     "GomSpace":
         {"file" : "GomSpace.xlsx",
@@ -13,7 +13,7 @@
         "end_date" : "2023-12-31",
         "sheet" : ["consolidated"],
         "color" : [229, 95, 147],
-        "style" : "dashdot"
+        "style" : "dotted"
         },
     "Planet":
         {"file" : "planet.xlsx",
@@ -21,7 +21,7 @@
         "end_date" : "2024-04-30",
         "sheet" : ["consolidated"],
         "color" : [139, 60, 103],
-        "style" : "-"
+        "style" : "dashed"
         },
     "Satellogic":
         {"file" : "satellogic.xlsx",
@@ -29,7 +29,7 @@
         "end_date" : "2023-12-31",
         "sheet" : ["consolidated"],
         "color" : [6, 32, 92],
-        "style" : "--"
+        "style" : "dashdot"
 	    },
     "Synspective":
         {"file" : "synspective.xlsx",
@@ -37,6 +37,6 @@
         "end_date" : "2022-12-31",
         "sheet" : ["consolidated"],
         "color" : [245, 167, 6],
-        "style" : "dotted"
+        "style" : ":"
         }
 }
