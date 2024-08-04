@@ -1,27 +1,39 @@
 {
+    "GomSpace":
+        {"file" : "gomspace.xlsx",
+        "start_date" : "2019-12-31",
+        "end_date" : "2023-12-31",
+        "sheet" : ["consolidated"],
+        "color" : [229, 95, 147],
+        "_HEXcolor": "#DE5C8E",
+        "style" : "solid"
+        },
     "iQPS":
         {"file" : "iQPS.xlsx",
         "start_date" : "2019-08-31",
         "end_date" : "2023-05-31",
         "sheet" : ["consolidated"],
         "color" : [0, 96, 176],
+        "_HEXcolor": "#0060B0",
         "style" : "solid"
         },
-    "GomSpace":
-        {"file" : "GomSpace.xlsx",
-        "start_date" : "2019-12-31",
-        "end_date" : "2023-12-31",
+    "Kleos Space":
+        {"file" : "kleos.xlsx",
+        "start_date" : "2018-12-31",
+        "end_date" : "2022-12-31",
         "sheet" : ["consolidated"],
-        "color" : [229, 95, 147],
+        "color" : [255, 85, 46],
+        "_HEXcolor": "#FF552E",
         "style" : "dotted"
         },
-    "Planet":
+    "Planet Labs":
         {"file" : "planet.xlsx",
         "start_date" : "2021-01-31",
         "end_date" : "2024-04-30",
         "sheet" : ["consolidated"],
         "color" : [139, 60, 103],
-        "style" : "dashed"
+        "_HEXcolor": "#8B3C67",
+        "style" : "dotted"
         },
     "Satellogic":
         {"file" : "satellogic.xlsx",
@@ -29,6 +41,7 @@
         "end_date" : "2023-12-31",
         "sheet" : ["consolidated"],
         "color" : [6, 32, 92],
+        "_HEXcolor": "#06205C",
         "style" : "dashdot"
 	    },
     "Synspective":
@@ -37,6 +50,7 @@
         "end_date" : "2022-12-31",
         "sheet" : ["consolidated"],
         "color" : [245, 167, 6],
-        "style" : ":"
+        "_HEXcolor": "#F5A706",
+        "style" : "dashdot"
         }
 }

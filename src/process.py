@@ -49,7 +49,7 @@ def transform_financial_metrics(company, filtered_data):
         "diffLogLiabilities": diffLogLiabilities,
         "diffLogEquity": diffLogEquity
     }
-    if company == "Synspective":
+    if company == "Synspective" or company == "Kleos Space":
             print("Not enough revenue data")
     else:
         revenue = filtered_data["Revenue"].values.astype(int)
@@ -132,7 +132,7 @@ for i, company in enumerate(company_metadata):
     fig4 = plot_growth_rate(fig4, ax4, transformed_data, "growthLiabilities", company_metadata, company, 'Total Liabilities Growth Rate (%)')
     fig5 = plot_growth_rate(fig5, ax5, transformed_data, "growthEquity", company_metadata, company, 'Total Equity Growth Rate (%)')
 
-    if company == "Synspective":
+    if company == "Synspective" or company == "Kleos Space":
         continue
     else:
         fig6 = plot_kpis(fig6, ax6, transformed_data, "financialLeverage", company_metadata, company, 'Financial Leverage')
