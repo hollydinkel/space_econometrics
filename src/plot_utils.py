@@ -29,10 +29,10 @@ def plotKPIs(fig, ax, data, key, companyMetadata, company, ylabel):
     return fig
 
 def plotPredictions(fig, ax, time, prediction, companyMetadata, company):
-    plt.title(company, fontsize=16)
+    ax.set_title(company, fontsize=16, fontweight='bold')
     ax.tick_params(axis='both', which='major', labelsize=16)
     ax.set_xlabel('Year', fontsize=16)
-    ax.set_ylabel('Revenue', fontsize=16)
+    ax.set_ylabel('Revenue ($ USD)', fontsize=16)
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
     ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
     company_color = np.array(companyMetadata[company]["color"]) / 255
