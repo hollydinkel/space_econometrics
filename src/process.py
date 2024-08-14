@@ -76,9 +76,9 @@ def transformFinancialMetrics(company, filteredData):
     return data
 
 # Lookup company-specific parameters from dictionary (plotting style, name, filename)
-metadataPath = './financial_data/company_metadata.json'
+metadataPath = './config/company_metadata.json'
 companyMetadata = json.load(open(metadataPath))
-exchangeRatePath = './financial_data/dollar-yen-exchange-rate-history.csv'
+exchangeRatePath = './config/dollar-yen-exchange-rate-history.csv'
 exchangeRateData = pd.read_csv(exchangeRatePath, header=None, names=['Date', 'Value'])
 exchangeRateData['Date'] = pd.to_datetime(exchangeRateData['Date'])
 
@@ -117,6 +117,11 @@ fig8, ax8 = plt.subplots(figsize=(10, 7), dpi=300)
 fig9, ax9 = plt.subplots(figsize=(10, 7), dpi=300)
 fig10, ax10 = plt.subplots(figsize=(10, 7), dpi=300)
 fig11, ax11 = plt.subplots(figsize=(10, 7), dpi=300)
+fig12, ax12 = plt.subplots(figsize=(10, 7), dpi=300)
+fig13, ax13 = plt.subplots(figsize=(10, 7), dpi=300)
+fig14, ax14 = plt.subplots(figsize=(10, 7), dpi=300)
+fig15, ax15 = plt.subplots(figsize=(10, 7), dpi=300)
+fig16, ax16 = plt.subplots(figsize=(10, 7), dpi=300)
 
 for i, company in enumerate(companyMetadata):
     print("COMPANY: ", company)
@@ -144,9 +149,18 @@ for i, company in enumerate(companyMetadata):
 
         # Forecast future values
         # In-Sample Prediction: Use the model to predict the underlying data
-        forecast = ardl_fit.predict(start=0, end=len(frame) - 1)
+        inSamplePredictions = ardl_fit.predict(start=0, end=len(frame) - 1)
 
-    company_color = np.asarray(companyMetadata[company]["color"]) / 255 # normalized color coordinates
+        if company == "iQPS":
+            plotPredictions(fig12, ax12, filteredData["Quarter"], inSamplePredictions, companyMetadata, company)
+        elif company == "GomSpace":
+            plotPredictions(fig13, ax13, filteredData["Quarter"], inSamplePredictions, companyMetadata, company)
+        elif company == "Kleos Space":
+            plotPredictions(fig14, ax14, filteredData["Quarter"], inSamplePredictions, companyMetadata, company)
+        elif company == "Planet Labs":
+            plotPredictions(fig15, ax15, filteredData["Quarter"], inSamplePredictions, companyMetadata, company)
+        elif company == "Satellogic":
+            plotPredictions(fig16, ax16, filteredData["Quarter"], inSamplePredictions, companyMetadata, company)
 
     plot_acf(transformedData["lnAssets"], lags=3, title=company, ax = ax1[i//3, i%3], color = 'red')
     plot_pacf(transformedData["lnAssets"], lags=2, title=company, ax = ax2[i//3, i%3], color = 'red')
@@ -198,3 +212,8 @@ fig8.savefig(f"./images/npm.png")
 fig9.savefig(f"./images/asset_turnover.png")
 fig10.savefig(f'./images/total_satellites.png')
 fig11.savefig(f'./images/fraction_constellation.png')
+fig12.savefig(f'./images/iqps_isp.png')
+fig13.savefig(f'./images/gom_isp.png')
+fig14.savefig(f'./images/kleos_isp.png')
+fig15.savefig(f'./images/planet_isp.png')
+fig16.savefig(f'./images/satellogic_isp.png')
