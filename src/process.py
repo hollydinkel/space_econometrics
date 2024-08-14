@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from utils import *
 from plot_utils import *
+pd.options.mode.chained_assignment = None
+plt.rcParams['figure.max_open_warning'] = 50
 
 def transformFinancialMetrics(company, filteredData):
 
@@ -28,6 +30,7 @@ def transformFinancialMetrics(company, filteredData):
     diffLogLiabilities = np.diff(np.log(filteredData["Total Liabilities"]))
     diffLogEquity = np.diff(np.log(filteredData["Total Equity"]))
 
+    totalSats = filteredData["Total Launched Satellites"].copy().iloc[-1]
     data = {
         "Quarter": filteredData["Quarter"],
         "totalAssets": filteredData["Total Assets"].values.astype(int),
@@ -49,7 +52,7 @@ def transformFinancialMetrics(company, filteredData):
         "diffLogLiabilities": diffLogLiabilities,
         "diffLogEquity": diffLogEquity,
         "totalSatellites": filteredData["Total Launched Satellites"],
-        "fractionConstellation": filteredData["Total Launched Satellites"]/filteredData["Total Launched Satellites"].iloc[-1]
+        "fractionConstellation": filteredData["Total Launched Satellites"]/totalSats
     }
     if company == "Synspective":
             print("Not enough revenue data")
@@ -132,10 +135,17 @@ for i, company in enumerate(companyMetadata):
 
     transformedData = transformFinancialMetrics(company, filteredData)
     stat, nonstat, error = getStationaryVariables(transformedData)
-    # print(stat, nonstat)
-    # dateRange = filteredData["Quarter"][:]
-    # frame = np.column_stack((transformedData["diffAssets"], transformedData["totalEquity"], transformedData["totalLiabilities"]))
-    # vecm = johansenVECM(dateRange, frame)
+    # print("Stationary: ", stat)
+    # print("Nonstationary: ", nonstat)
+    if company != "Synspective":
+        dateRange = filteredData["Quarter"]
+        frame = np.column_stack((transformedData["totalAssets"], transformedData["totalEquity"], transformedData["totalLiabilities"], transformedData["totalSatellites"]))
+        ardl_fit = ardl_model(transformedData["Revenue"], frame, 10)
+
+        # Forecast future values
+        # In-Sample Prediction: Use the model to predict the underlying data
+        forecast = ardl_fit.predict(start=0, end=len(frame) - 1)
+
     company_color = np.asarray(companyMetadata[company]["color"]) / 255 # normalized color coordinates
 
     plot_acf(transformedData["lnAssets"], lags=3, title=company, ax = ax1[i//3, i%3], color = 'red')
