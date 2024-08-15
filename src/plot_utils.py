@@ -10,6 +10,7 @@ def plotGrowthRate(fig, ax, data, key, companyMetadata, company, ylabel):
     company_color = np.array(companyMetadata[company]["color"]) / 255
     ax.plot(data["Quarter"][1:], data[key], color=company_color, linestyle=companyMetadata[company]["style"], label=company, linewidth=10)
     ax.legend(ncol=3, bbox_to_anchor=(0.9, -0.15), fancybox=True, title="Company", fontsize='16', frameon=True)
+    ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
     fig.tight_layout()
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
@@ -23,6 +24,7 @@ def plotKPIs(fig, ax, data, key, companyMetadata, company, ylabel):
     company_color = np.array(companyMetadata[company]["color"]) / 255
     ax.plot(data["Quarter"], data[key], color=company_color, linestyle=companyMetadata[company]["style"], label=company, linewidth=10)
     ax.legend(ncol=3, bbox_to_anchor=(0.9, -0.15), fancybox=True, title="Company", fontsize='16', frameon=True)
+    ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
     fig.tight_layout()
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
@@ -39,6 +41,7 @@ def plotPredictions(fig, ax, company, time=None, prediction=None, ground_truth=N
         ax.set_ylabel('Revenue ($ USD)', fontsize=16)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
+        ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
         ax.plot(time, prediction, color=company_color, linestyle="dotted", label="In-Sample Prediction", linewidth=10)
         ax.plot(time, ground_truth, color=company_color, linestyle="solid", label="Ground Truth", linewidth=10)
         ax.legend(ncol=2, bbox_to_anchor=(0.85, -0.15), fancybox=True, fontsize='16', frameon=True)
