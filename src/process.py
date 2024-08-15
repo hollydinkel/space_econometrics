@@ -55,7 +55,16 @@ def transformFinancialMetrics(company, filteredData):
         "fractionConstellation": filteredData["Total Launched Satellites"]/totalSats
     }
     if company == "Synspective":
-            print("Not enough revenue data")
+        # Merge filteredData with exchangeRateData_data based on dates
+        merged_data = pd.merge(filteredData, yenExchangeRateData, left_on='Quarter', right_on='Date', how='left')
+        merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
+        merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
+        merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
+        # Handle missing values
+        data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill')
+        data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill')
+        data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill')
+        print("Not enough revenue data")
     else:
         revenue = filteredData["Revenue"].values.astype(int)
         data["Revenue"] = revenue
@@ -69,18 +78,55 @@ def transformFinancialMetrics(company, filteredData):
         data["ROE"] = data["netProfitMargin"]*data["assetTurnover"]*data["financialLeverage"]
         if company == "iQPS":
             # Merge filteredData with exchangeRateData_data based on dates
-            merged_data = pd.merge(filteredData, exchangeRateData, left_on='Quarter', right_on='Date', how='left')
+            merged_data = pd.merge(filteredData, yenExchangeRateData, left_on='Quarter', right_on='Date', how='left')
             merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
-            data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill')  # Handle missing values
+            merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
+            merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
+            merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
+            # Handle missing values
+            data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill')
+            data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill')
+            data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill')
+            data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill')
+        if company == "GomSpace":
+            # Merge filteredData with exchangeRateData_data based on dates
+            merged_data = pd.merge(filteredData, sekExchangeRateData, left_on='Quarter', right_on='Date', how='left')
+            merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
+            merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
+            merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
+            merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
+            # Handle missing values
+            data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill')
+            data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill')
+            data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill')
+            data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill')
+        if company == "Kleos Space":
+            # Merge filteredData with exchangeRateData_data based on dates
+            merged_data = pd.merge(filteredData, eurExchangeRateData, left_on='Quarter', right_on='Date', how='left')
+            merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
+            merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
+            merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
+            merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
+            # Handle missing values
+            data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill')
+            data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill')
+            data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill')
+            data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill')
 
     return data
 
 # Lookup company-specific parameters from dictionary (plotting style, name, filename)
 metadataPath = './config/company_metadata.json'
 companyMetadata = json.load(open(metadataPath))
-exchangeRatePath = './config/dollar-yen-exchange-rate-history.csv'
-exchangeRateData = pd.read_csv(exchangeRatePath, header=None, names=['Date', 'Value'])
-exchangeRateData['Date'] = pd.to_datetime(exchangeRateData['Date'])
+yenExchangeRatePath = './config/usd-yen-exchange-rate-history.csv'
+yenExchangeRateData = pd.read_csv(yenExchangeRatePath, header=None, names=['Date', 'Value'])
+yenExchangeRateData['Date'] = pd.to_datetime(yenExchangeRateData['Date'])
+sekExchangeRatePath = './config/usd-sek-exchange-rate-history.csv'
+sekExchangeRateData = pd.read_csv(sekExchangeRatePath, header=None, names=['Date', 'Value'])
+sekExchangeRateData['Date'] = pd.to_datetime(sekExchangeRateData['Date'])
+eurExchangeRatePath = './config/usd-eur-exchange-rate-history.csv'
+eurExchangeRateData = pd.read_csv(eurExchangeRatePath, header=None, names=['Date', 'Value'])
+eurExchangeRateData['Date'] = pd.to_datetime(eurExchangeRateData['Date'])
 
 fig1, ax1 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
 fig1.suptitle("ACF: lnAssets", fontsize=20)
