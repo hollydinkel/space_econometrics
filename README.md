@@ -4,7 +4,7 @@ This repository contains the data and analysis code to support methods in our pa
 
 *Authors listed in alphabetical order by last name.
 
-# Motivation
+## Motivation
 
 Enhanced access to space, climate and natural resource monitoring, space-based awareness, on-demand analytics, and data independence motivate a growing commercial EO market. An increasing number of diverse companies globally strive to establish their own competitive market niche, but often do not reach commercial viability. Existing work provides market intelligence and identifies trends in venture financing. These methods do not indicate cultural and financial mechanisms enabling the innovation required to sustain market share for incumbent players or market penetration for emerging ones.
 
@@ -14,6 +14,10 @@ This study measures the innovation success of selected companies worldwide based
   <img src="images/total_asset_growth_rate.png" width="250" title="Total Asset Growth Rate">
   <img src="images/total_equity_growth_rate.png" width="250" title="Total Equity Growth Rate">
   <img src="images/total_liabilities_growth_rate.png" width="250" title="Total Liabilities Growth Rate">
+</p>
+
+<p align="center">
+  <img src="images/revenue_separate.png" width="500" title="Revenue">
 </p>
 
 ## Dependencies
