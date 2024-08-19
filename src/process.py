@@ -41,6 +41,7 @@ def transformFinancialMetrics(company, filteredData):
     else:
         revenue = filteredData["Revenue"]
         data["Revenue"] = pd.Series(revenue).reset_index(drop=True)
+        data["EBITDA"] = pd.Series(filteredData["EBITDA"]).reset_index(drop=True)
         data["financialLeverage"] = (data["totalAssets"]/data["totalEquity"]).reset_index(drop=True)
         data["assetTurnover"] = (data["Revenue"]/data["totalAssets"]).reset_index(drop=True)
         data["netProfitMargin"] = (filteredData["Net Loss"].reset_index(drop=True)/data["Revenue"])
@@ -49,11 +50,13 @@ def transformFinancialMetrics(company, filteredData):
             # Merge filteredData with exchangeRateData_data based on dates
             merged_data = pd.merge(filteredData, yenExchangeRateData, left_on='Quarter', right_on='Date', how='left')
             merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
+            merged_data['EBITDA_USD'] = merged_data['EBITDA'] / merged_data['Value']
             merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
             merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
             merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
             # Handle missing values
             data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
+            data["EBITDA_USD"] = merged_data['EBITDA_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
@@ -61,11 +64,13 @@ def transformFinancialMetrics(company, filteredData):
             # Merge filteredData with exchangeRateData_data based on dates
             merged_data = pd.merge(filteredData, sekExchangeRateData, left_on='Quarter', right_on='Date', how='left')
             merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
+            merged_data['EBITDA_USD'] = merged_data['EBITDA'] / merged_data['Value']
             merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
             merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
             merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
             # Handle missing values
             data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
+            data["EBITDA_USD"] = merged_data['EBITDA_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
@@ -73,16 +78,19 @@ def transformFinancialMetrics(company, filteredData):
             # Merge filteredData with exchangeRateData_data based on dates
             merged_data = pd.merge(filteredData, eurExchangeRateData, left_on='Quarter', right_on='Date', how='left')
             merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
+            merged_data['EBITDA_USD'] = merged_data['EBITDA'] / merged_data['Value']
             merged_data['Total_Assets_USD'] = merged_data['Total Assets'] / merged_data['Value']
             merged_data['Total_Liabilities_USD'] = merged_data['Total Liabilities'] / merged_data['Value']
             merged_data['Total_Equity_USD'] = merged_data['Total Equity'] / merged_data['Value']
             # Handle missing values
             data["Revenue_USD"] = merged_data['Revenue_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
+            data["EBITDA_USD"] = merged_data['EBITDA_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
         elif company == "Planet Labs" or "Satellogic":
             data["Revenue_USD"] = filteredData['Revenue'].reset_index(drop=True)
+            data["EBITDA_USD"] = filteredData['EBITDA'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Assets_USD"] = filteredData['Total Assets'].reset_index(drop=True)
             data["Total_Liabilities_USD"] = filteredData['Total Liabilities'].reset_index(drop=True)
             data["Total_Equity_USD"] = filteredData['Total Equity'].reset_index(drop=True)
@@ -129,7 +137,11 @@ fig25, ax25 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
 fig25.suptitle("ACF: Revenue", fontsize=20)
 fig26, ax26 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
 fig26.suptitle("PACF: Revenue", fontsize=20)
-acf_list = [fig1, fig2, fig21, fig22, fig23, fig24, fig25, fig26]
+fig27, ax27 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig27.suptitle("ACF: EBITDA", fontsize=20)
+fig28, ax28 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
+fig28.suptitle("PACF: EBITDA", fontsize=20)
+acf_list = [fig1, fig2, fig21, fig22, fig23, fig24, fig25, fig26, fig27, fig28]
 
 # KPI Plots
 fig3, ax3 = plt.subplots(figsize=(10, 7), dpi=300)
@@ -205,6 +217,8 @@ for i, company in enumerate(companyMetadata):
         fig17 = plotKPIs(fig17, ax17, transformedData, "Revenue_USD", companyMetadata, company, 'Revenue ($USD)')
         plot_acf(transformedData["Revenue_USD"], lags=3, title=company, ax = ax25[i//3, i%3], color = 'red')
         plot_pacf(transformedData["Revenue_USD"], lags=2, title=company, ax = ax26[i//3, i%3], color = 'red')
+        plot_acf(transformedData["EBITDA_USD"], lags=3, title=company, ax = ax27[i//3, i%3], color = 'red')
+        plot_pacf(transformedData["EBITDA_USD"], lags=2, title=company, ax = ax28[i//3, i%3], color = 'red')
         plotPredictions(fig18, ax18[i//3, i%3], company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split, plotEverything=True)
     else:
         plotPredictions(fig18, ax18[i//3, i%3], company, companyMetadata, plotEverything=True)
@@ -231,8 +245,10 @@ fig21.savefig(f"./images/acf_analysis/Liabilities_acf.png", bbox_inches='tight')
 fig22.savefig(f"./images/acf_analysis/Liabilities_pacf.png", bbox_inches='tight')
 fig23.savefig(f"./images/acf_analysis/Equity_acf.png", bbox_inches='tight')
 fig24.savefig(f"./images/acf_analysis/Equity_pacf.png", bbox_inches='tight')
-fig25.savefig(f"./images/acf_analysis/Revenue.png", bbox_inches='tight')
-fig26.savefig(f"./images/acf_analysis/Revenue.png", bbox_inches='tight')
+fig25.savefig(f"./images/acf_analysis/Revenue_acf.png", bbox_inches='tight')
+fig26.savefig(f"./images/acf_analysis/Revenue_pacf.png", bbox_inches='tight')
+fig27.savefig(f"./images/acf_analysis/EBITDA_acf.png", bbox_inches='tight')
+fig28.savefig(f"./images/acf_analysis/EBITDA_pacf.png", bbox_inches='tight')
 fig3.savefig(f"./images/total_asset_growth_rate.png", bbox_inches='tight')
 fig4.savefig(f"./images/total_liabilities_growth_rate.png", bbox_inches='tight')
 fig5.savefig(f"./images/total_equity_growth_rate.png", bbox_inches='tight')
