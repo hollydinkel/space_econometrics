@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas.tseries.offsets import DateOffset
 import numpy as np
 import json
 import matplotlib.pyplot as plt
@@ -88,6 +89,16 @@ def transformFinancialMetrics(company, filteredData):
 
     return data
 
+# Function to generate the next n quarters after a given start date
+def generate_next_quarters(start_date, n):
+    quarters = []
+    current_date = start_date
+    for _ in range(n):
+        current_date = (current_date + DateOffset(months=3)).replace(day=1) - pd.DateOffset(days=1)
+        quarters.append(current_date)
+        current_date = current_date + pd.DateOffset(months=3)
+    return quarters
+
 # Lookup company-specific parameters from dictionary (plotting style, name, filename)
 metadataPath = './config/company_metadata.json'
 companyMetadata = json.load(open(metadataPath))
@@ -101,6 +112,7 @@ eurExchangeRatePath = './config/usd-eur-exchange-rate-history.csv'
 eurExchangeRateData = pd.read_csv(eurExchangeRatePath, header=None, names=['Date', 'Value'])
 eurExchangeRateData['Date'] = pd.to_datetime(eurExchangeRateData['Date'])
 
+# ACF/PACF Plots
 fig1, ax1 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
 fig1.suptitle("ACF: Assets", fontsize=20)
 fig2, ax2 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
@@ -119,6 +131,7 @@ fig26, ax26 = plt.subplots(2, 3, figsize=(12, 10), dpi=300)
 fig26.suptitle("PACF: Revenue", fontsize=20)
 acf_list = [fig1, fig2, fig21, fig22, fig23, fig24, fig25, fig26]
 
+# KPI Plots
 fig3, ax3 = plt.subplots(figsize=(10, 7), dpi=300)
 fig4, ax4 = plt.subplots(figsize=(10, 7), dpi=300)
 fig5, ax5 = plt.subplots(figsize=(10, 7), dpi=300)
@@ -155,30 +168,35 @@ for i, company in enumerate(companyMetadata):
     stat, nonstat, error = getStationaryVariables(transformedData)
     # print("Stationary: ", stat)
     # print("Nonstationary: ", nonstat)
+
+    # Use 90% of the data for in-sample training and 10% for out-of-sample evaluation
+    split = int(np.ceil(0.1*len(transformedData['Quarter'])))
     if company != "Synspective":
-        frame = np.column_stack((transformedData["Total_Assets_USD"], transformedData["Total_Equity_USD"], transformedData["Total_Liabilities_USD"], transformedData["totalSatellites"]))
-        ardl_fit = ardl_model(transformedData["Revenue_USD"], frame, 10)
+        filtered_quarters = pd.to_datetime(transformedData['Quarter'])
 
-        # Forecast future values
+        # Determine the last quarter
+        last_quarter = filtered_quarters.max()
+        trainingFrame = np.column_stack((transformedData["Total_Assets_USD"][:-split], transformedData["Total_Equity_USD"][:-split], transformedData["Total_Liabilities_USD"][:-split], transformedData["totalSatellites"][:-split]))
+        testingFrame = np.column_stack((transformedData["Total_Assets_USD"][-split:], transformedData["Total_Equity_USD"][-split:], transformedData["Total_Liabilities_USD"][-split:], transformedData["totalSatellites"][-split:]))
+        ardl_fit = ardl_model(transformedData["Revenue_USD"][:-split], trainingFrame, 10)
+
         # In-Sample Prediction: Use the model to predict the underlying data
-        endDateTime = pd.to_datetime(transformedData["Quarter"].values[0])
-        startDateTime = pd.to_datetime(transformedData["Quarter"].values[-1])
-        forecast_end = startDateTime.strftime('%Y-%m-%d')
-        forecast_start = endDateTime.strftime('%Y-%m-%d')
-        # print(transformedData)
-        # inSamplePredictions = ardl_fit.predict(start=forecast_start, end=forecast_end)
-        inSamplePredictions = ardl_fit.predict(start=0, end=len(frame)-1)
+        inSamplePredictions = ardl_fit.predict(start=0, end=len(trainingFrame)-1)
+        # Out-of-Sample Forecasting: Use the model to forecast on unseen data
+        # Note, ardl_fit.predict will output same amount of data it was trained on, hence indexing up to [:split]
+        outSamplePredictions = ardl_fit.predict(exog_oos=testingFrame)[:split]
 
+        # print(filteredData["Quarter"])
         if company == "iQPS":
-            plotPredictions(fig12, ax12, company, filteredData["Quarter"], inSamplePredictions, transformedData["Revenue_USD"], companyMetadata)
+            plotPredictions(fig12, ax12, company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split)
         elif company == "GomSpace":
-            plotPredictions(fig13, ax13, company, filteredData["Quarter"], inSamplePredictions, transformedData["Revenue_USD"], companyMetadata)
+            plotPredictions(fig13, ax13, company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split)
         elif company == "Kleos Space":
-            plotPredictions(fig14, ax14, company, filteredData["Quarter"], inSamplePredictions, transformedData["Revenue_USD"], companyMetadata)
+            plotPredictions(fig14, ax14, company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split)
         elif company == "Planet Labs":
-            plotPredictions(fig15, ax15, company, filteredData["Quarter"], inSamplePredictions, transformedData["Revenue_USD"], companyMetadata)
+            plotPredictions(fig15, ax15, company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split)
         elif company == "Satellogic":
-            plotPredictions(fig16, ax16, company, filteredData["Quarter"], inSamplePredictions, transformedData["Revenue_USD"], companyMetadata)
+            plotPredictions(fig16, ax16, company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split)
 
         fig6 = plotKPIs(fig6, ax6, transformedData, "financialLeverage", companyMetadata, company, 'Financial Leverage')
         fig7 = plotKPIs(fig7, ax7, transformedData, "ROE", companyMetadata, company, 'Return on Equity')
@@ -187,9 +205,9 @@ for i, company in enumerate(companyMetadata):
         fig17 = plotKPIs(fig17, ax17, transformedData, "Revenue_USD", companyMetadata, company, 'Revenue ($USD)')
         plot_acf(transformedData["Revenue_USD"], lags=3, title=company, ax = ax25[i//3, i%3], color = 'red')
         plot_pacf(transformedData["Revenue_USD"], lags=2, title=company, ax = ax26[i//3, i%3], color = 'red')
-        plotPredictions(fig18, ax18[i//3, i%3], company, filteredData["Quarter"], inSamplePredictions, transformedData["Revenue_USD"], companyMetadata, plotEverything=True)
+        plotPredictions(fig18, ax18[i//3, i%3], company, companyMetadata, filteredData["Quarter"], inSamplePredictions, outSamplePredictions, transformedData["Revenue_USD"], split, plotEverything=True)
     else:
-        plotPredictions(fig18, ax18[i//3, i%3], company, plotEverything=True)
+        plotPredictions(fig18, ax18[i//3, i%3], company, companyMetadata, plotEverything=True)
 
     plot_acf(transformedData["Total_Assets_USD"], lags=3, title=company, ax = ax1[i//3, i%3], color = 'red')
     plot_pacf(transformedData["Total_Assets_USD"], lags=2, title=company, ax = ax2[i//3, i%3], color = 'red')
