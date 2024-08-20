@@ -1,8 +1,8 @@
 {
     "iQPS":
     {"file" : "iQPS.xlsx",
-    "startDate" : "2019-08-31",
-    "endDate" : "2023-05-31",
+    "startDate" : "2021-05-31",
+    "endDate" : "2024-05-31",
     "sheet" : ["consolidated"],
     "color" : [0, 96, 176],
     "_HEXcolor": "#0060B0",
