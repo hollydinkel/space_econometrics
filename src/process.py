@@ -208,7 +208,7 @@ for i, company in enumerate(companyMetadata):
         # print(filteredData["Quarter"])
         if company == "iQPS":
             plotPredictions(fig10, ax10, company, companyMetadata, filteredData["Quarter"], inSamplePredictions1, outSamplePredictions1, transformedData["Revenue_USD"], "Revenue ($ USD)", split)
-        elif company == "GomSpace":
+        elif company == "GOMSpace":
             plotPredictions(fig11, ax11, company, companyMetadata, filteredData["Quarter"], inSamplePredictions1, outSamplePredictions1, transformedData["Revenue_USD"], "Revenue ($ USD)", split)
         elif company == "Kleos Space":
             plotPredictions(fig12, ax12, company, companyMetadata, filteredData["Quarter"], inSamplePredictions1, outSamplePredictions1, transformedData["Revenue_USD"], "Revenue ($ USD)", split)

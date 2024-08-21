@@ -80,6 +80,6 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         line2, = ax.plot([], [], color='k', linestyle="dashed", alpha=0.5, linewidth=12, label='Out-of-Sample Prediction')
         line3, = ax.plot([], [], color='k', linestyle="solid", linewidth=12, label='Ground Truth Data')
         # Add the legend with specified labels
-        fig.legend([line1, line2, line3], ['In-Sam1le Prediction', 'Out-of-Sample Prediction', 'Ground Truth Data'],
+        fig.legend([line1, line2, line3], ['In-Sample Prediction', 'Out-of-Sample Prediction', 'Ground Truth Data'],
            loc='upper center', bbox_to_anchor=(0.5, 0.08), ncol=3, prop={'size': size})
     return fig
