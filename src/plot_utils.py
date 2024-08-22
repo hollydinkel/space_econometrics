@@ -45,8 +45,8 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
-        ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="dotted", label="In-Sample Prediction", linewidth=10)
-        ax.plot(time[-split:], outSamplePrediction, color=company_color, alpha=0.5, linestyle="dashed", label="Out-of-Sample Prediction", linewidth=10)
+        ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="", marker=".", markersize=18, label="In-Sample Prediction")
+        ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="", label="Out-of-Sample Prediction")
         ax.plot(time, ground_truth, color=company_color, linestyle="solid", label="Ground Truth", linewidth=10)
         ax.legend(ncol=3, bbox_to_anchor=(1.0, -0.15), fancybox=True, fontsize='14', frameon=True)
         box = ax.get_position()
@@ -62,8 +62,8 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.set_yscale('log')
         ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
         ax.set_ylim([1, 10**9])
-        ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="dotted", linewidth=12)
-        ax.plot(time[-split:], outSamplePrediction, color=company_color, alpha=0.5, linestyle="dashed", linewidth=12)
+        ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="", marker=".", markersize=18)
+        ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="")
         ax.plot(time, ground_truth, color=company_color, linestyle="solid", linewidth=12)
     elif company == "Synspective" and plotEverything:
         ax.set_xticks([])
@@ -76,8 +76,8 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
-        line1, = ax.plot([], [], color='k', linestyle="dotted", linewidth=12, label='In-Sample Prediction')
-        line2, = ax.plot([], [], color='k', linestyle="dashed", alpha=0.5, linewidth=12, label='Out-of-Sample Prediction')
+        line1, = ax.plot([], [], color='k', linestyle="", marker=".", markersize=18, label='In-Sample Prediction')
+        line2, = ax.plot([], [], color='k', marker="*", markersize=18, linestyle="", label='Out-of-Sample Prediction')
         line3, = ax.plot([], [], color='k', linestyle="solid", linewidth=12, label='Ground Truth Data')
         # Add the legend with specified labels
         fig.legend([line1, line2, line3], ['In-Sample Prediction', 'Out-of-Sample Prediction', 'Ground Truth Data'],

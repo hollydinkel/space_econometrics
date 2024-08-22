@@ -184,7 +184,7 @@ for i, company in enumerate(companyMetadata):
     # print("Nonstationary: ", nonstat)
 
     # Use 90% of the data for in-sample training and 10% for out-of-sample evaluation
-    split = int(np.ceil(0.1*len(transformedData['Quarter'])))
+    split = int(np.ceil(0.2*len(transformedData['Quarter'])))
     if company != "Synspective":
         filtered_quarters = pd.to_datetime(transformedData['Quarter'])
 
