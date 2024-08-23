@@ -46,7 +46,7 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
         ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="", marker=".", markersize=18, label="In-Sample Prediction")
-        ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="", label="Out-of-Sample Prediction")
+        ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="", label="Out-of-Sample Forecast")
         ax.plot(time, ground_truth, color=company_color, linestyle="solid", label="Ground Truth", linewidth=10)
         ax.legend(ncol=3, bbox_to_anchor=(1.0, -0.15), fancybox=True, fontsize='14', frameon=True)
         box = ax.get_position()
@@ -77,9 +77,9 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.spines['left'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
         line1, = ax.plot([], [], color='k', linestyle="", marker=".", markersize=18, label='In-Sample Prediction')
-        line2, = ax.plot([], [], color='k', marker="*", markersize=18, linestyle="", label='Out-of-Sample Prediction')
+        line2, = ax.plot([], [], color='k', marker="*", markersize=18, linestyle="", label='Out-of-Sample Forecast')
         line3, = ax.plot([], [], color='k', linestyle="solid", linewidth=12, label='Ground Truth Data')
         # Add the legend with specified labels
-        fig.legend([line1, line2, line3], ['In-Sample Prediction', 'Out-of-Sample Prediction', 'Ground Truth Data'],
+        fig.legend([line1, line2, line3], ['In-Sample Prediction', 'Out-of-Sample Forecast', 'Ground Truth Data'],
            loc='upper center', bbox_to_anchor=(0.5, 0.08), ncol=3, prop={'size': size})
     return fig
