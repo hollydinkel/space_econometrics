@@ -60,7 +60,7 @@ def transformFinancialMetrics(company, filteredData):
             data["Total_Assets_USD"] = merged_data['Total_Assets_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Liabilities_USD"] = merged_data['Total_Liabilities_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
             data["Total_Equity_USD"] = merged_data['Total_Equity_USD'].fillna(method='ffill').astype(int).reset_index(drop=True)
-        elif company == "GomSpace":
+        elif company == "GOMSpace":
             # Merge filteredData with exchangeRateData_data based on dates
             merged_data = pd.merge(filteredData, sekExchangeRateData, left_on='Quarter', right_on='Date', how='left')
             merged_data['Revenue_USD'] = merged_data['Revenue'] / merged_data['Value']
