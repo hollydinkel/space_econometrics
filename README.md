@@ -11,13 +11,8 @@ Enhanced access to space, climate and natural resource monitoring, space-based a
 This study measures the innovation success of selected companies worldwide based on internal policies, management approaches, and market demand. Time-series financial metrics indicate innovation trends for businesses across the commercial EO landscape.
 
 <p align="center">
-  <img src="images/total_asset_growth_rate.png" width="250" title="Total Asset Growth Rate">
-  <img src="images/total_equity_growth_rate.png" width="250" title="Total Equity Growth Rate">
-  <img src="images/total_liabilities_growth_rate.png" width="250" title="Total Liabilities Growth Rate">
-</p>
-
-<p align="center">
-  <img src="images/revenue_separate.png" width="500" title="Revenue">
+  <img src="images/revenue_separate.png" width="900" title="Revenue">
+  <img src="images/ebitda_separate.png" width="900" title="EBITDA">
 </p>
 
 ## Dependencies

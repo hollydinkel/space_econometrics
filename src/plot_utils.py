@@ -34,7 +34,7 @@ def plotKPIs(fig, ax, data, key, companyMetadata, company, ylabel):
     plt.rcParams['legend.title_fontsize'] = '16'
     return fig
 
-def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePrediction=None, outSamplePrediction=None, ground_truth=None, ylabel=None, split=None, plotEverything=False):
+def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePrediction=None, outSamplePrediction=None, ground_truth=None, ylabel=None, split=None, plotEverything=False, EBITDA=None):
     size = 22
     if company != "Synspective" and not plotEverything:
         company_color = np.array(companyMetadata[company]["color"]) / 255
@@ -56,12 +56,15 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.set_title(company, fontsize=size, fontweight='bold')
         ax.tick_params(axis='both', which='major', labelsize=18)
         ax.set_xlabel('Year', fontsize=size)
-        ax.set_ylabel('Revenue ($ USD)', fontsize=size)
+        ax.set_ylabel(ylabel, fontsize=size)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
-        ax.set_yscale('log')
         ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
-        ax.set_ylim([1, 10**9])
+        if not EBITDA:
+            ax.set_yscale('log')
+            ax.set_ylim([1, 10**9])
+        elif EBITDA:
+            ax.set_ylim([-1.5*10**8, 1.5*10**8])
         ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="", marker=".", markersize=18)
         ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="")
         ax.plot(time, ground_truth, color=company_color, linestyle="solid", linewidth=12)
