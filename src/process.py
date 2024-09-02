@@ -195,6 +195,7 @@ for i, company in enumerate(companyMetadata):
         ardl1_fit = ardl_model(transformedData["Revenue_USD"][:-split], trainingFrame1, 10)
         trainingFrame2 = np.column_stack((trainingFrame1, transformedData["Revenue_USD"][:-split]))
         testingFrame2 = np.column_stack((testingFrame1, transformedData["Revenue_USD"][-split:]))
+        print("COMPANY: ", company)
         ardl2_fit = ardl_model(transformedData["EBITDA_USD"][:-split], trainingFrame2, 10)
         
         # In-Sample Prediction: Use the model to predict the underlying data
