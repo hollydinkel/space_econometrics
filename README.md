@@ -16,7 +16,7 @@ This study measures the innovation success of selected companies worldwide based
 </p>
 
 <p align="center">
-  <img src="images/ardl_model.png" width="700" title="Revenue">
+  <img src="images/ardl_example.png" width="700" title="ARDL Example">
 </p>
 
 ## Dependencies
