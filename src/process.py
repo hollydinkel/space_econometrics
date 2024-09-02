@@ -227,11 +227,11 @@ for i, company in enumerate(companyMetadata):
         plot_pacf(transformedData["Revenue_USD"], lags=2, title=company, ax = ax28[i//3, i%3], color = 'red')
         plot_acf(transformedData["EBITDA_USD"], lags=3, title=company, ax = ax29[i//3, i%3], color = 'red')
         plot_pacf(transformedData["EBITDA_USD"], lags=2, title=company, ax = ax30[i//3, i%3], color = 'red')
-        plotPredictions(fig17, ax17[i], company, companyMetadata, filteredData["Quarter"], inSamplePredictions1, outSamplePredictions1, transformedData["Revenue_USD"], "Revenue $ (USD)", split, plotEverything=True, EBITDA=False)
-        plotPredictions(fig18, ax18[i], company, companyMetadata, filteredData["Quarter"], inSamplePredictions2, outSamplePredictions2, transformedData["EBITDA_USD"], "EBITDA $ (USD)", split, plotEverything=True, EBITDA=True)
+        plotPredictions(fig17, ax17[i], company, companyMetadata, filteredData["Quarter"], inSamplePredictions1, outSamplePredictions1, transformedData["Revenue_USD"], "Revenue $ (USD)", split, plotEverything=True)
+        plotPredictions(fig18, ax18[i], company, companyMetadata, filteredData["Quarter"], inSamplePredictions2, outSamplePredictions2, transformedData["EBITDA_USD"], "EBITDA $ (USD)", split, plotEverything=True)
     else:
-        plotPredictions(fig17, ax17[i], company, companyMetadata, plotEverything=True, EBITDA=False)
-        plotPredictions(fig18, ax18[i], company, companyMetadata, plotEverything=True, EBITDA=True)
+        plotPredictions(fig17, ax17[i], company, companyMetadata, plotEverything=True)
+        plotPredictions(fig18, ax18[i], company, companyMetadata, plotEverything=True)
 
     plot_acf(transformedData["Total_Assets_USD"], lags=3, title=company, ax = ax21[i//3, i%3], color = 'red')
     plot_pacf(transformedData["Total_Assets_USD"], lags=2, title=company, ax = ax22[i//3, i%3], color = 'red')
