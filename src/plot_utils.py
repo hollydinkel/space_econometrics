@@ -1,3 +1,5 @@
+# /usr/bin/python3
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.ticker import SymmetricalLogLocator as symlog
@@ -37,7 +39,7 @@ def plotKPIs(fig, ax, data, key, companyMetadata, company, ylabel):
 
 def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePrediction=None, outSamplePrediction=None, ground_truth=None, ylabel=None, split=None, plotEverything=False):
     size = 22
-    if company != "Synspective" and not plotEverything:
+    if not plotEverything:
         company_color = np.array(companyMetadata[company]["color"]) / 255
         ax.set_title(company, fontsize=16, fontweight='bold')
         ax.tick_params(axis='both', which='major', labelsize=16)
@@ -52,14 +54,17 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.legend(ncol=3, bbox_to_anchor=(1.0, -0.15), fancybox=True, fontsize='14', frameon=True)
         box = ax.get_position()
         ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
-    elif company!= "Synspective" and plotEverything:
+    elif plotEverything:
         company_color = np.array(companyMetadata[company]["color"]) / 255
         ax.set_title(company, fontsize=size, fontweight='bold')
         ax.tick_params(axis='both', which='major', labelsize=18)
         ax.set_xlabel('Year', fontsize=size)
         ax.set_ylabel(ylabel, fontsize=size)
         ax.set_yscale('symlog')
-        vmin, vmax = -10**9, 10**9
+        if ylabel=="Revenue $ (USD)":
+            vmin, vmax = 0, 10**9
+        else:
+            vmin, vmax = -10**9, 10**9
         ax.set_yticks(tick_values(vmin, vmax, 7))
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.set_ylim([vmin, vmax])
@@ -67,23 +72,13 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="", marker=".", markersize=18)
         ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="")
         ax.plot(time, ground_truth, color=company_color, linestyle="solid", linewidth=12)
-    elif company == "Synspective" and plotEverything:
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_title(company, fontsize=size, fontweight='bold')
-        ax.text(0.5, 0.5, 'Data not available', horizontalalignment='center',
-        verticalalignment='center', fontsize=size, color='black',
-        transform=ax.transAxes)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
+    if ylabel=="Revenue $ (USD)":
         line1, = ax.plot([], [], color='k', linestyle="", marker=".", markersize=18, label='In-Sample Prediction')
         line2, = ax.plot([], [], color='k', marker="*", markersize=18, linestyle="", label='Out-of-Sample Forecast')
         line3, = ax.plot([], [], color='k', linestyle="solid", linewidth=12, label='Ground Truth Data')
         # Add the legend with specified labels
         fig.legend([line1, line2, line3], ['In-Sample Prediction', 'Out-of-Sample Forecast', 'Ground Truth Data'],
-           loc='upper center', bbox_to_anchor=(0.5, 0.05), ncol=3, prop={'size': size})
+            loc='upper center', bbox_to_anchor=(0.5, 0.05), ncol=3, prop={'size': size})
     return fig
 
 # Fixes setting number of ticks on a symlog scale, copied from:
