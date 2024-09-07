@@ -38,7 +38,7 @@ def plotKPIs(fig, ax, data, key, companyMetadata, company, ylabel):
     return fig
 
 def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePrediction=None, outSamplePrediction=None, ground_truth=None, ylabel=None, split=None, plotEverything=False):
-    size = 22
+    size = 32
     if not plotEverything:
         company_color = np.array(companyMetadata[company]["color"]) / 255
         ax.set_title(company, fontsize=16, fontweight='bold')
@@ -56,8 +56,8 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
     elif plotEverything:
         company_color = np.array(companyMetadata[company]["color"]) / 255
-        ax.set_title(company, fontsize=size, fontweight='bold')
-        ax.tick_params(axis='both', which='major', labelsize=18)
+        ax.set_title(company, fontsize=40, fontweight='bold')
+        ax.tick_params(axis='both', which='major', labelsize=size)
         ax.set_xlabel('Year', fontsize=size)
         ax.set_ylabel(ylabel, fontsize=size)
         ax.set_yscale('symlog')
@@ -69,16 +69,16 @@ def plotPredictions(fig, ax, company, companyMetadata, time=None, inSamplePredic
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
         ax.set_ylim([vmin, vmax])
         ax.set_xlim([pd.to_datetime('2018-06-01'), pd.to_datetime('2024-12-31')])
-        ax.plot(time[:-split], inSamplePrediction, color=company_color, linestyle="", marker=".", markersize=18)
-        ax.plot(time[-split:], outSamplePrediction, color=company_color, marker="*", markersize=18, linestyle="")
-        ax.plot(time, ground_truth, color=company_color, linestyle="solid", linewidth=12)
+        ax.plot(time[:-split], inSamplePrediction, color=company_color, alpha=0.7, linestyle="", marker="s", markersize=40)
+        ax.plot(time[-split:], outSamplePrediction, color=company_color, alpha=0.7, marker="*", markersize=40, linestyle="")
+        ax.plot(time, ground_truth, color=company_color, linestyle="solid", linewidth=20)
     if ylabel=="Revenue $ (USD)":
-        line1, = ax.plot([], [], color='k', linestyle="", marker=".", markersize=18, label='In-Sample Prediction')
-        line2, = ax.plot([], [], color='k', marker="*", markersize=18, linestyle="", label='Out-of-Sample Forecast')
-        line3, = ax.plot([], [], color='k', linestyle="solid", linewidth=12, label='Ground Truth Data')
+        line1, = ax.plot([], [], color='k', linestyle="", alpha=0.7, marker="s", markersize=40, label='In-Sample Prediction')
+        line2, = ax.plot([], [], color='k', marker="*", alpha=0.7, markersize=40, linestyle="", label='Out-of-Sample Forecast')
+        line3, = ax.plot([], [], color='k', linestyle="solid", linewidth=20, label='Ground Truth Data')
         # Add the legend with specified labels
         fig.legend([line1, line2, line3], ['In-Sample Prediction', 'Out-of-Sample Forecast', 'Ground Truth Data'],
-            loc='upper center', bbox_to_anchor=(0.5, 0.05), ncol=3, prop={'size': size})
+            loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, prop={'size': size}, fontsize=size)
     return fig
 
 # Fixes setting number of ticks on a symlog scale, copied from:
