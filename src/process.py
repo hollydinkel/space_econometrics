@@ -1,3 +1,5 @@
+# /usr/bin/python3
+
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
 import numpy as np
@@ -160,8 +162,8 @@ fig13, ax13 = plt.subplots(figsize=(10, 7), dpi=300)
 fig14, ax14 = plt.subplots(figsize=(10, 7), dpi=300)
 fig15, ax15 = plt.subplots(figsize=(10, 7), dpi=300)
 fig16, ax16 = plt.subplots(figsize=(10, 7), dpi=300)
-fig17, ax17 = plt.subplots(1, 5, figsize=(55, 10), dpi=300)
-fig18, ax18 = plt.subplots(1, 5, figsize=(55, 10), dpi=300)
+fig17, ax17 = plt.subplots(1, 5, figsize=(70, 10), dpi=300)
+fig18, ax18 = plt.subplots(1, 5, figsize=(70, 10), dpi=300)
 
 for i, company in enumerate(companyMetadata):
     print("COMPANY: ", company)
@@ -230,8 +232,6 @@ for i, company in enumerate(companyMetadata):
         plot_pacf(transformedData["EBITDA_USD"], lags=2, title=company, ax = ax30[i//3, i%3], color = 'red')
         plotPredictions(fig17, ax17[i], company, companyMetadata, filteredData["Quarter"], inSamplePredictions1, outSamplePredictions1, transformedData["Revenue_USD"], "Revenue $ (USD)", split, plotEverything=True)
         plotPredictions(fig18, ax18[i], company, companyMetadata, filteredData["Quarter"], inSamplePredictions2, outSamplePredictions2, transformedData["EBITDA_USD"], "EBITDA $ (USD)", split, plotEverything=True)
-    else:
-        pass
 
     plot_acf(transformedData["Total_Assets_USD"], lags=3, title=company, ax = ax21[i//3, i%3], color = 'red')
     plot_pacf(transformedData["Total_Assets_USD"], lags=2, title=company, ax = ax22[i//3, i%3], color = 'red')

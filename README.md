@@ -11,8 +11,8 @@ Enhanced access to space, climate and natural resource monitoring, space-based a
 This study measures the innovation success of selected companies worldwide based on internal policies, management approaches, and market demand. Time-series metrics, including Return on Equity, Net Profit Margin, Financial Leverage, Asset Turnover, Asset Growth Rate, Equity Growth Rate, and Liabilities Growth Rate, indicate financial trends for businesses across the commercial EO landscape. An Auto-Regressive Distributed Lag model is also implemented to identify the impacts of assets, equity, liabilities, and number of satellites on company revenue and EBITDA. The model is used to forecast revenue and EBITDA into the future for each company.
 
 <p align="center">
-  <img src="images/revenue_separate.png" width="900" title="Revenue">
-  <img src="images/ebitda_separate.png" width="900" title="EBITDA">
+  <img src="images/ebitda_separate.png" width="700" title="EBITDA">
+  <img src="images/revenue_separate.png" width="700" title="Revenue">
 </p>
 
 <p align="center">
